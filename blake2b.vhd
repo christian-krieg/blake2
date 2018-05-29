@@ -20,7 +20,7 @@
 -- TU Wien
 -- April 2018
 --
--- This is a wrapper for the blake2 entity. It only defines the generics as
+-- This is a wrapper for the 'blake2' entity. It only defines the generics as
 -- needed for Blake2b
 --
 --------------------------------------------------------------------------------
@@ -206,3 +206,5 @@ begin
 	);
 
 end behav;
+--
+--------------------------------------------------------------------------------
