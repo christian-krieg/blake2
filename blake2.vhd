@@ -1,31 +1,46 @@
 --------------------------------------------------------------------------------
+--
+-- VHDL implementation of the BLAKE2 Cryptographic Hash and Message
+-- Authentication Code as described by Markku-Juhani O. Saarinen and
+-- Jean-Philippe Aumasson in https://doi.org/10.17487/RFC7693
+--
+-- Authors:
+--
+--   Benedikt Tutzer
+--   Dinka Milovancev
+--
+--
+-- Supervisors:
+--
+--   Christian Krieg
+--   Martin Mosbeck
+--   Axel Jantsch
+--
+-- Institute of Computer Technology
+-- TU Wien
+-- April 2018
+--
+-- HOW TO USE: Split the message to be hashed into chunks of BLOCK_SIZE bytes.
+-- Send them to the entity sequentially by setting the message port and raising
+-- valid_in for one clock-cycle. message_len needs to be set to the number of
+-- bytes that are to be hashed in total, the length of the hash can be chosen by
+-- setting hash_len. After sending one chunk, wait for compress_ready to be high
+-- before sending the next chunk. When the last chunk is sent, the input
+-- last_chunk needs to be set to high. After the last chunk is encoded, the
+-- output valid_out will be raised and the hash will be available at its output
+-- port
+--
 --------------------------------------------------------------------------------
-
---VHDL implementation of the BLAKE2 Cryptographic Hash and Message
---Authentication Code as described by Markku-Juhani O. Saarinen and
---Jean-Philippe Aumasson in https://doi.org/10.17487/RFC7693
-
---authors Benedikt Tutzer and Dinka Milovancev
---april 2018
-
---HOW TO USE: Split the message to be hashed into chunks of BLOCK_SIZE bytes.
---Send them to the entity sequentially by setting the message port and raising
---valid_in for one clock-cycle. message_len needs to be set to the number of
---bytes that are to be hashed in total, the length of the hash can be chosen by
---setting hash_len. After sending one chunk, wait for compress_ready to be high
---before sending the next chunk. When the last chunk is sent, the input
---last_chunk needs to be set to high. After the last chunk is encoded, the
---output valid_out will be raised and the hash will be available at its output
---port
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
+--
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+--
+--------------------------------------------------------------------------------
+--
 
 entity blake2 is
+
 	generic (
 		--width of the internal state vectors
 		BASE_WIDTH : integer range 32 to 64 := 64;
@@ -38,6 +53,7 @@ entity blake2 is
 		--the maximal length of input messages
 		MAX_MESSAGE_LENGTH : integer := 2147483647
 	);
+
 	port (
 		--high active reset signal
 		reset		: in	std_logic;
@@ -73,10 +89,15 @@ entity blake2 is
 		hash		:out	std_logic_vector(MAX_HASH_LENGTH*8-1 downto 0)
 	);
 end blake2;
-
+--
+--------------------------------------------------------------------------------
+--
 architecture behav of blake2 is
 
-	--SIGMA as defined in the paper https://doi.org/10.17487/RFC7693
+	--
+	-- SIGMA as defined in RFC7693
+	--
+
 	type sig_t is array(0 to 11, 0 to 15) of INTEGER range 0 to 15;
 	constant SIGMA : sig_t :=
 	(
@@ -94,7 +115,10 @@ architecture behav of blake2 is
 		(14,10, 4, 8, 9,15,13, 6, 1,12, 0, 2,11, 7, 5, 3)
 	);
 
-	--indizes for the 8 mixing rounds. 1 row per count, 1 column per operator
+	--
+	-- Indices for eight mixing rounds. One row per count, 1 column per operator
+	--
+
 	type ind_t is array(0 to 7, 0 to 5) of INTEGER range 0 to 15;
 	constant ind : ind_t :=
 	(
@@ -113,7 +137,9 @@ architecture behav of blake2 is
 	type arr8_64 is array(0 to 7) of std_logic_vector(63 downto 0);
 	type arr16 is array(15 downto 0) of std_logic_vector(BASE_WIDTH-1 downto 0);
 	
-	--initialization vector for blake2
+	--
+	-- Initialization vector for Blake2
+	--
 	constant VI : arr8_64 :=
 	(
 		X"6A09E667F3BCC908",
@@ -126,7 +152,9 @@ architecture behav of blake2 is
 		X"5BE0CD19137E2179"
 	);
 
-	--states for the state machine
+	--
+	-- States for the state machine
+	--
 	type state_type is (STATE_IDLE, STATE_PREPARE, STATE_WAIT, STATE_MIX_H,
 		STATE_COMPRESS, STATE_MIX_A, STATE_MIX_B, STATE_DONE);
 	signal state : state_type;
