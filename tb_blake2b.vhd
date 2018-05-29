@@ -111,16 +111,16 @@ begin
 	dut : blake2b
 
 	port map (
-		reset			=> reset,
-		clk			=> clk,
-		message			=> message,
-		valid_in		=> valid_in,
-		message_len		=> message_len,
-		hash_len		=> hash_len,
-		compress_ready		=> compress_ready,
-		last_chunk		=> last_chunk,
-		valid_out		=> valid_out,
-		hash			=> hash
+		reset          => reset,
+		clk            => clk,
+		message        => message,
+		valid_in       => valid_in,
+		message_len    => message_len,
+		hash_len       => hash_len,
+		compress_ready => compress_ready,
+		last_chunk     => last_chunk,
+		valid_out      => valid_out,
+		hash           => hash
 	);
 
 
@@ -139,13 +139,14 @@ begin
 
 	end process;
 
+
 	stimuli : process
 
 		type char_file_t is file of character;
 		file message_file : TEXT open read_mode is "messages.txt";
 		file hash_file_2b : TEXT open read_mode is "hashes_blake2b.txt";
 		variable line_buffer : line;
-		variable value_in : std_logic_vector(64*8-1 downto 0);
+		variable value_in : std_logic_vector(64 * 8 - 1 downto 0);
 		variable char_value_1 : std_logic_vector(7 downto 0);
 		variable char_value_2 : std_logic_vector(7 downto 0);
 		variable read_ok : boolean;
@@ -187,7 +188,7 @@ begin
 			--
 			message_len <= line_buffer'length;
 
-			for i in 0 to line_buffer'length-1 loop
+			for i in 0 to line_buffer'length - 1 loop
 
 				--
 				-- Read one byte of data and write it to 'message'.
@@ -223,7 +224,7 @@ begin
 			valid_in <= '1';
 			wait for period;
 			valid_in <= '0';
-			wait for period*835;
+			wait for period * 835;
 
 			readline(hash_file_2b, line_buffer);
 
