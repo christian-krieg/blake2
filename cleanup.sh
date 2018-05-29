@@ -1,3 +1,4 @@
+#!/bin/bash
 #------------------------------------------------------------------------------
 #
 # VHDL implementation of the BLAKE2 Cryptographic Hash and Message
@@ -5,13 +6,11 @@
 # Jean-Philippe Aumasson in https://doi.org/10.17487/RFC7693
 #
 # Authors:
-#
 #   Benedikt Tutzer
 #   Dinka Milovancev
 #
 #
 # Supervisors:
-#
 #   Christian Krieg
 #   Martin Mosbeck
 #   Axel Jantsch

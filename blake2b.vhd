@@ -5,13 +5,10 @@
 -- Jean-Philippe Aumasson in https://doi.org/10.17487/RFC7693
 --
 -- Authors:
---
 --   Benedikt Tutzer
 --   Dinka Milovancev
 --
---
 -- Supervisors:
---
 --   Christian Krieg
 --   Martin Mosbeck
 --   Axel Jantsch
@@ -31,7 +28,6 @@ use ieee.numeric_std.all;
 --
 --------------------------------------------------------------------------------
 --
-
 entity blake2b is
 
 	generic (
@@ -61,7 +57,6 @@ entity blake2b is
 		-- Desired hash length in bytes
 		--
 		hash_len: in integer range 1 to 64;
-
 
 		--
 		-- High as long as chunks are sent

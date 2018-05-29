@@ -5,13 +5,10 @@
 -- Jean-Philippe Aumasson in https://doi.org/10.17487/RFC7693
 --
 -- Authors:
---
 --   Benedikt Tutzer
 --   Dinka Milovancev
 --
---
 -- Supervisors:
---
 --   Christian Krieg
 --   Martin Mosbeck
 --   Axel Jantsch
@@ -85,7 +82,7 @@ entity blake2 is
 		--
 		-- Chunk of message to be hashed
 		--
-		message: in std_logic_vector(BLOCK_SIZE*8-1 downto 0);
+		message: in std_logic_vector(BLOCK_SIZE * 8 - 1 downto 0);
 
 		--
 		-- Desired hash length in bytes
