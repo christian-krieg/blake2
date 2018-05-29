@@ -31,7 +31,7 @@
 --
 -- 'hashes_blake2s.txt':
 --
---   Fill this file with the corresponding blake2b hashes.
+--   Fill this file with the corresponding blake2s hashes.
 --
 -- The messages will be sent to the entity and the generated hashes will be
 -- compared to the hashes in the hashes_blake2s file.
@@ -143,7 +143,7 @@ begin
 
 		type char_file_t is file of character;
 		file message_file : TEXT open read_mode is "messages.txt";
-		file hash_file_2b : TEXT open read_mode is "hashes_blake2s.txt";
+		file hash_file_2s : TEXT open read_mode is "hashes_blake2s.txt";
 		variable line_buffer : line;
 		variable value_in : std_logic_vector(32 * 8 - 1 downto 0);
 		variable char_value_1 : std_logic_vector(7 downto 0);
@@ -234,7 +234,7 @@ begin
 			counter := 0;
 			value_in := (others => '0');
 
-			for i in 0 to 63 loop
+			for i in 0 to 31 loop
 
 				read(line_buffer, current_char);
 				char_value_1 := std_logic_vector(to_unsigned(character'pos(current_char),8));

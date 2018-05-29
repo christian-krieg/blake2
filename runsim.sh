@@ -33,8 +33,8 @@ rm hashes_blake2b.txt
 rm hashes_blake2s.txt
 
 while IFS='' read -r line || [[ -n "$line" ]]; do
-	./testgen/bin_testgen_blake2b $line >> hashes_blake2b.txt
-	./testgen/bin_testgen_blake2s $line >> hashes_blake2s.txt
+	./testgen/blake2b $line >> hashes_blake2b.txt
+	./testgen/blake2s $line >> hashes_blake2s.txt
 done < messages.txt
 
 ghdl -s --std=08 *.vhd

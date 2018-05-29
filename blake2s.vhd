@@ -51,7 +51,7 @@ entity blake2s is
 		--
 		-- Chunk of message to be hashed
 		--
-		message		: in	std_logic_vector(128 * 8 - 1 downto 0);
+		message: in	std_logic_vector(64 * 8 - 1 downto 0);
 
 		--
 		-- Desired hash length in bytes
@@ -113,64 +113,16 @@ architecture behav of blake2s is
 		);
 
 		port (
-
-			--
-			-- Active-high reset signal
-			--
-			reset: in std_logic;
-		
-			--
-			-- System clock
-			--
-			clk: in std_logic;
-
-
-			--
-			-- Chunk of message to be hashed
-			--
-			message: in std_logic_vector(BLOCK_SIZE * 8 - 1 downto 0);
-
-			--
-			-- Desired hash length in bytes
-			--
-			hash_len: in integer range 1 to MAX_HASH_LENGTH;
-
-
-			--
-			-- High as long as chunks are sent
-			--
-			valid_in: in std_logic;
-
-			--
-			-- Number of bytes to be hashed:
-			--
-			--   The algorithm could handle messages up to a length of 2**128 bytes,
-			--   but VHDL can not handle numbers that big.  The maximal length
-			--   required by argon is 1032, therefore that value was chosen as a
-			--   limit.
-			--
-			message_len: in	integer range 0 to MAX_MESSAGE_LENGTH;
-
-			--
-			-- Ready for next chunk
-			--
-			compress_ready: out	std_logic;
-
-			--
-			-- High when the last chunk is sent
-			--
-			last_chunk: in std_logic;
-
-			--
-			-- High when the output is valid
-			--
-			valid_out: out std_logic;
-
-			--
-			-- Generated hash in little endian
-			--
-			hash: out std_logic_vector(MAX_HASH_LENGTH * 8 - 1 downto 0)
-
+			reset          : in std_logic;
+			clk            : in std_logic;
+			message        : in std_logic_vector(BLOCK_SIZE * 8 - 1 downto 0);
+			hash_len       : in integer range 1 to MAX_HASH_LENGTH;
+			valid_in       : in std_logic;
+			message_len    : in integer range 0 to MAX_MESSAGE_LENGTH;
+			compress_ready : out std_logic;
+			last_chunk     : in std_logic;
+			valid_out      : out std_logic;
+			hash           : out std_logic_vector(MAX_HASH_LENGTH * 8 - 1 downto 0)
 		);
 
 	end component;
