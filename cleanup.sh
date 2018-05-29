@@ -9,7 +9,6 @@
 #   Benedikt Tutzer
 #   Dinka Milovancev
 #
-#
 # Supervisors:
 #   Christian Krieg
 #   Martin Mosbeck
