@@ -331,7 +331,8 @@ begin
 						--
 						-- If this was the last chunk, the number of received bytes is equal
 						-- to the length of the received message. Otherwise it is increased
-						-- by 128.
+						-- by the double base width (which is 128 for BALKE2b)
+						--
 						if last_chunk = '1' then
 							compressed_bytes <= std_logic_vector(to_unsigned(message_len, BASE_WIDTH*2));
 						else
