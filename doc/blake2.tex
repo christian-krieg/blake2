@@ -334,6 +334,10 @@
 %
 %----------------------------------------------------------------------------
 %
+\usepackage{makecell}
+%
+%----------------------------------------------------------------------------
+%
 % Use \textsubscript
 %
 \usepackage{fixltx2e}
@@ -857,15 +861,15 @@ The state machine described above is implemented in \emph{blake2.vhd}.
 %
 %----------------------------------------------------------------------------
 %
-\section{Verification}
-\label{sec:verification}
+\section{Functional Verification}
+\label{sec:functional-verification}
 
 In order to verify that the \emph{BLAKE2b} specification was correctly
-implementedd, we designed a test bench that reads input from a file
+implemented, we designed a test bench that reads input from a file
 \emph{messages.txt} line by line.
 %
 Each line is hashed by the implemented algorithm. The same input
-data is being provided the reference implementation from RFC 7693~%
+data is provided by the reference implementation in RFC 7693~%
 \autocite{rfc7693}, which calculates the corresponding hash values. The
 reference values are stored in the file \emph{hashes.txt}.
 %
@@ -875,7 +879,7 @@ the reference values created by the reference implementation.
 
 NOTE: In order to read the hash values from \emph{hashes.txt}, we need to
 convert the values from hexadecimal to \emph{std_logic_vector}. We used the
-\emph{ASCII_2_STD} function.
+\emph{ASCII_2_STD} function \todo{from the XXX library}.
 
 % This can be seen in the \Cref{code:testing}.
 
@@ -988,9 +992,9 @@ convert the values from hexadecimal to \emph{std_logic_vector}. We used the
 %when the next message block is to be received. The wave form diagram also shows
 %the counters for mixing rounds and mixing operations.
 %
-\Cref{fig:signaling} shows the situation where a message block is fully compressed
-and a new message block is ready to be compressed (i.e., the round counter
-\emph{ci_done} is `11', and the state is \mbox{STATE_WAIT}).
+\Cref{fig:timing} shows the situation where a message block has been fully
+compressed and a new message block is ready to be compressed (i.e., the round
+counter \emph{ci_done} is `11', and the state is \mbox{STATE_WAIT}).
 %
 The BLAKE2 core signals this situation by setting \emph{valid_in} to `HIGH'
 for one clock cycle.
@@ -1007,43 +1011,115 @@ code signal \emph{mio\_left}.
 %
 Compressing of one 1024-bit message block consumes 835 clock cycles.
 
-\begin{figure}[!ht]
+\begin{figure}[tb]
 	\centering
 	\includegraphics[width=\textwidth]{waveform2.eps};
-	\caption{Simulation results for blake2b hash function: state transitions}
+	\caption{Simulation results for BLAKE2b hash function: state transitions
+		\todo{Can we draw this in TikZ (using the TikZ timing package)? Adapting
+			\Cref{fig:timing} may be the most straight-forward approach.}}
 	\label{fig:signaling}
 \end{figure}
 
-For the message data input we used the hexadecimal random data from Task 1 as
-1032 byte input message. Additional  message was created by replacing only the
-first character with '1' in order to verify that even such a small change in
-input can lead to entirely different hash values. This can be seen in
-\Cref{2messagehash}. These hash values matched the hash values from the C code
-implementation.
-
-\begin{figure}[!ht]
+\begin{figure}[tb]
 	\centering
-	\begin{tikzpicture}[
-			circuit logic IEC,
-			circuit ee IEC,
-			x = 5cm, y = 2cm,
-			every info/.style = {font = \scriptsize},
-			set diode graphic = var diode IEC graphic,
-			set make contact graphic = var make contact IEC graphic,
-		]
-
-		\node at (0,0) {\includegraphics[scale=0.52]{hashmessage.eps}};
-
-	\end{tikzpicture}
-	\caption{Similar input data results in a very different hash messages}
-	\label{2messagehash}
+	\begin{tikztimingtable}
+		CLK & 30{ T } \\
+		$X$ & 15{D}{X} HHLLHHLLHHLLHHL \\
+		$O$ & 15{ L } HHLLHHLLHHLLHHL\\
+		$T$ & 15{ L } 15{H} \\
+	\extracode
+		\begin{pgfonlayer}{background}
+			\vertlines[black]{15}
+		\end{pgfonlayer}
+	\end{tikztimingtable}
+	\caption{Example timing diagram set in TikZ timing}
+	\label{fig:timing}
 \end{figure}
+
+\Cref{tbl:blake2b-hashes} shows two example hashes for BLAKE2b. In order to
+show that a small change in the message results in a large change in the hash,
+we replaced one character of the original message (``\texttt{\small{}Message}''
+vs. ``\texttt{\small{}Massage}''). \Cref{tbl:blake2s-hashes} shows the hash
+values for the same input messages hashed with BLAKE2s.
+
+\begin{table}[tb]
+	\centering
+	\caption{Example hashes and corresponding input messages for BLAKE2b}	
+	\label{tbl:blake2b-hashes}
+	\begin{tabular}{l|l|l}
+	\hline
+	Input message & Hash & Hash length \\
+	\hline
+	\texttt{\small{}Message}
+	& \makecell[cc]{%
+		\texttt{\small{}547ee071 8a19d53f df9f6123 8f31c139} \\
+		\texttt{\small{}1979e95a 191505ba aa821805 1c4702d6} \\
+		\texttt{\small{}f95d4312 d5c268f0 c6b4aa98 787dd91e} \\
+		\texttt{\small{}3296ea3c d6d94833 fdfd5bae 39656b3c} \\
+	}
+	& 64 bytes \\
+	\hline
+	\texttt{\small{}Massage} &
+	\makecell[cc]{%
+		\texttt{\small{}566cb134 f53e14f2 7b49fcf5 45f4c71c} \\
+		\texttt{\small{}4486c824 c0fe5359 c61df882 d610c38e} \\
+		\texttt{\small{}88b25a1a 3e5790c4 b0099c9f 55f0ebc6} \\
+		\texttt{\small{}71cf2aec 4a9b9134 d3f05b9e 8eee1612} \\
+	}
+	& 64 bytes \\
+	\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[tb]
+	\centering
+	\caption{Example hashes and corresponding input messages for BLAKE2s
+		\todo{We should try different hash lengths down to the minimum, which is
+			one byte}}	
+	\label{tbl:blake2s-hashes}
+	\begin{tabular}{l|l|l}
+	\hline
+	Input message & Hash & Hash length \\
+	\hline
+	\texttt{\small{}Message}
+	& \makecell[cc]{%
+		\texttt{\small{}94bb1d33 b1ae1a65 aa1dad9b ade6c30b} \\
+		\texttt{\small{}14f6ba03 0b6ab5e5 c9756aba 26b77219} \\
+	}
+	& 32 bytes \\
+	\hline
+	\texttt{\small{}Massage} &
+	\makecell[cc]{%
+		\texttt{\small{}f153acb5 47c9d8a3 199c4820 3d488df4} \\
+		\texttt{\small{}82cc5a21 e760251a b7f090b7 7bdf8b5f} \\
+	}
+	& 32 bytes \\
+	\hline
+	\end{tabular}
+\end{table}
 
 Since this design is to be used as a module of the larger \emph{Argon2}
 design, there were no ports to be mapped to the hardware and therefore placing
 and routing of the design was not possible, but the RTL synthesis and
 optimization was successfully completed. The RTL optimization report is shown
 in  \Cref{RTLsynthesis}.
+%
+%----------------------------------------------------------------------------
+%
+\section{Formal Verification}
+\label{sec:formal-verification}
+
+\todo{I put this here as a future point. Formal verification of a
+security-related core should be standard anyway. We should definitely teach
+that in next year's lab.}
+%
+%----------------------------------------------------------------------------
+%
+\section{Resource Allocation}
+\label{sec:resource-allocation}
+
+\todo{Here we should put tables for different targets (BLAKE2b, BLAKE2s with
+different bit widths) and hardware targets (Nexys and Ice40).}
 
 \begin{lstlisting}[
 	style = vhdl,
@@ -1093,45 +1169,61 @@ Finished RTL Hierarchical Component Statistics
 ----------------------------------------------
 
 \end{lstlisting}
-
-
-
 %
 %----------------------------------------------------------------------------
 %
-\section{Discussion}
-\label{sec:discussion}
-In the reference paper \autocite{rfc7693} for \emph{BLAKE2b} hash function
-coded in C, the input parameter was the whole message that can have between 1
-and $2^{128}$ bytes. This long message was intended to be divided into
-128-byte message blocks during computing. Since the VHDL cannot support such
-large input vectors we decided to send the message block by block. In this way
-our data input is 128 bytes long and we have additional information about the
-message length ($message\_len$). The maximum message length was specified to
-be 1032 bytes since this is the maximum length needed by \emph{Argon2}. For
-every message block we need the information of the main module whether there
-is a new message block available (signal $valid\_in$ goes high) and the flag
-register for the last message block $last\_chunk$ (high if the last message
-block is sent). As the output we provide handshaking signals $compress\_ready$
-and $valid\_out$, the user of our entity must make sure that $compress\_ready$
-is high before sending a new message block, and the output i.e. the hash can
-be stored when $valid\_out$ is high.
+\section{Usage}
+\label{sec:usage}
 
+\todo{Put in here typical usage examples the can be copied/pasted and ready to be
+used. I think it would be cool to have this for all the variants given in
+\Cref{sec:resource-allocation}}.
+%
+%----------------------------------------------------------------------------
+%
+\section{Additional notes}
+\label{sec:additional-notes}
+
+For the reference implementation given in RFC 7693~\autocite{rfc7693},
+the input parameter is the whole message whose length can have between 1
+and $2^{128}$ bytes.
+%
+This long message is intended to be divided into 128-byte message blocks
+during hash computation. Since the VHDL cannot support such large input
+vectors, we decided to send the message block by block.
+%
+This way, our data input is 128 bytes long, and we introduced additional
+information regarding the message length (\emph{message_len} input).
+%
+The maximum message length was specified to be 1032 bytes since this is the
+maximum length needed by \emph{Argon2}.\todo{Is this still valid?}
+%
+For every message block we need the information of the main module whether there
+is a new message block available (signal \emph{valid_in} goes high) and the flag
+register for the last message block \emph{last_chunk} (high if the last message
+block is sent).
+%
+For the output we provide handshaking signals \emph{compress_ready}
+and $valid\_out$, the user of our package must make sure that
+\emph{compress_ready} is high before sending a new message block, and the
+output hash can be stored when \emph{valid_out} is high.
+%
 The input messages in \texttt{messages.txt} file can be empty message. However
-messages are not allowed to contain whitespaces.
+messages are not allowed to contain whitespace \todo{Why not? This is a very
+strong constraint! We should definitely allow whitespace.}.
 %----------------------------------------------------------------------------
 %
-\section{Conclusions}
-\label{sec:conclusions}
+\section{Concluding remarks}
+\label{sec:conclusding-remarks}
 
-In this task we implemented \emph{BLAKE2b} hash algorithm in the hardware. The
-design was synthesizable, however the final utilization report can be done
-once the entity module is used inside the \emph{Argon2} implementation, when
-it will be mapped to the target hardware (\emph{Nexys 4 DDR}). 
-
-The functional verification of our design was performed through simulation.
-The random data was used as the message input and the reference implementation
-in C was used to validate that the correct hash output has been computed.
+We implemented \emph{BLAKE2b} and \emph{BLAKE2s} hash algorithms in \gls{vhdl}.
+The design is fully synthesizable. We functionally verified our design by
+simulation. We used the reference implementation given in C in the original
+specification of BLAKE2~\autocite{rfc7693} to verify that we correctly
+implemented the algorithm. On the ICE40 architecture, BLAKE2b consumes
+\todo{XYZ resources, running at a maximum clock of ZYX Hz}, and BLAKE2s
+onsumes \todo{from ABC to DEF resources, running at a maximum clock speed of
+GHI Hz}.
 %
 %----------------------------------------------------------------------------
 %
