@@ -384,6 +384,7 @@
 %----------------------------------------------------------------------------
 \begin{titlepage}
 
+	\begin{center}
 
 	\includegraphics[height=2cm]{fig/logo-tu.png}%
 	\hfill{}%
@@ -392,7 +393,6 @@
 
 	\vspace{5em}
 
-	\begin{center}
 
 		\large
 		Benedikt TUTZER\\
@@ -443,7 +443,8 @@ be implemented targeting \emph{Nexyx 4 DDR} board.
 \section{Overview}
 \label{sec:overview}
 
-\todo{Include a block diagram of the top-level entities here!}
+\todo{Include a block diagram of the top-level entities here, ideally
+created with TikZ.}
 
 The \emph{BLAKE2} hash function comes in two variants: \emph{BLAKE2b} for
 64-bit platforms and \emph{BLAKE2s} for smaller architectures.
@@ -538,18 +539,6 @@ reconstruct the input data from the hash value.
 We verify the quality of our \emph{BLAKE2b} implementation by comparing the
 outputs to thte outputs produced by the reference implementation,
 available as C code in RFC~7693 \autocite[16-26]{rfc7693}.
-
-
-%
-%Briefly introduce your task here, state the problem and outline why it is
-%important to solve this problem. Use \texttt{\textbackslash{}autocite}
-%to cite any external reference, for example a
-%survey\autocite{Petura2016} on \gls{fpga}-based \glspl{trng}. Use
-%\emph{biber} to create the bibliography. \emph{JabRef}\autocite{JabRef} is
-%a good graphical frontend to maintain your bibliography. Use the commands
-%provided by the \texttt{\textbackslash{}glossaries} package to typeset
-%acronyms, like \gls{trng} and \gls{fpga}. This will help you in consistently
-%introducing and using abbreviations and acronyms.
 %
 %----------------------------------------------------------------------------
 %
@@ -653,215 +642,10 @@ the following states (and state transitions):
 
 \noindent
 The state machine described above is implemented in \emph{blake2.vhd}.
-
-%\enlargethispage{-\baselineskip}
-%\begin{lstlisting}[
-%	style = vhdl,
-%	caption = {VHDL implementation of the \emph{BLAKE2b} hash function},
-%	label = {code:sampling},
-%]
-%
-%process(clk, reset)
-%	--help variables for the mixing operations. These correspond
-%	--to the variable names in the paper
-%	variable a : std_logic_vector(63 downto 0);
-%	variable b : std_logic_vector(63 downto 0);
-%	variable c : std_logic_vector(63 downto 0);
-%	variable d : std_logic_vector(63 downto 0);
-%	variable x : std_logic_vector(63 downto 0);
-%	variable y : std_logic_vector(63 downto 0);
-%	variable help_sigma_x : integer range 0 to 15;
-%	variable help_sigma_y : integer range 0 to 15;
-%	begin
-%		if reset = '1' then
-%			state <= STATE_IDLE;
-%			current_chunk <= (others => '0');
-%			seen_last <= '0';
-%			compress_ready <= '1';
-%			h <= (others => (others => '0'));
-%			v <= (others => (others => '0'));
-%			compressed_bytes <= (others => '0');
-%			mio_left <= "00";
-%			valid_out <= '0';
-%			hash <= (others => '0');
-%		elsif rising_edge(clk) then
-%			--assign the right local vector and message to the variables
-%			--according to the index table
-%			a := v(ind(mi_done, 0));
-%			b := v(ind(mi_done, 1));
-%			c := v(ind(mi_done, 2));
-%			d := v(ind(mi_done, 3));
-%			help_sigma_x := SIGMA(ci_done, ind(mi_done,4));
-%			x := current_chunk(help_sigma_x*64+63 downto help_sigma_x*64);
-%			help_sigma_y := SIGMA(ci_done, ind(mi_done,5));
-%			y := current_chunk(help_sigma_y*64+63 downto help_sigma_y*64);
-%
-%			case(state) is
-%				when STATE_IDLE =>
-%					--initialize the persistent state vector
-%					h(1 to 7) <= VI(1 to 7);
-%					h(0) <= VI(0) xor (X"00000000010100" &
-%						std_logic_vector(
-%						to_unsigned(hash_len, 8)));
-%					--no bytes yet received
-%					if valid_in = '1' then
-%						--if a message chunk is received, it is saved together
-%						--with all inputs and the state machine moves to the
-%						--prepare state
-%						state <= STATE_PREPARE;
-%						current_chunk <= message;
-%						seen_last <= last_chunk;
-%						ci_done <= 0;
-%						compress_ready <= '0';
-%						total_bytes <= message_len;
-%						--if this was the last chunk, the number of received
-%						--bytes is equal to the length of the received message.
-%						--Otherwise it is increased by 128.
-%						if last_chunk = '1' then
-%							compressed_bytes <= std_logic_vector(
-%								to_unsigned(message_len, 128));
-%						else
-%							compressed_bytes <= std_logic_vector(
-%								unsigned(compressed_bytes) + 128);
-%						end if;
-%						--the entity is not ready to receive new input
-%						valid_out <= '0';
-%					end if;
-%				when STATE_PREPARE =>
-%					--the persistent state vector is copied onto the local
-%					--state vector
-%					for i in 0 to 7 loop
-%						V(i) <= h(i);
-%					end loop;
-%					V(8) <= VI(0);
-%					V(9) <= VI(1);
-%					V(10) <= VI(2);
-%					V(11) <= VI(3);
-%					--the number of received bytes is mixed into the vector
-%					V(12) <= VI(4) xor compressed_bytes(63 downto 0);
-%					V(13) <= VI(5) xor compressed_bytes(127 downto 64);
-%					--inverted if the last chunk is sent
-%					if seen_last = '1' then
-%						V(14) <= not VI(6);
-%					else
-%						V(14) <= VI(6);
-%					end if;
-%					V(15) <= VI(7);
-%					--reset the counter for the compression stage
-%					ci_done <= 0;
-%					--move on to the compress state
-%					state <= STATE_COMPRESS;
-%
-%				when STATE_WAIT =>
-%					--a subsequent message chunk was received (not the first)
-%					if valid_in = '1' then
-%						state <= STATE_PREPARE;
-%						current_chunk <= message;
-%						seen_last <= last_chunk;
-%						compress_ready <= '0';
-%						if last_chunk = '1' then
-%							compressed_bytes <= std_logic_vector(
-%								to_unsigned(total_bytes,128));
-%						else
-%							compressed_bytes <= std_logic_vector(
-%								unsigned(compressed_bytes) + 128);
-%						end if;
-%					end if;
-%
-%				when STATE_COMPRESS =>
-%					--reset the counter for the mixing stage
-%					mi_done <= 0;
-%					--start mixing
-%					state <= STATE_MIX_A;
-%				when STATE_MIX_A =>
-%					--additions as defined by blake2b
-%					case mio_left is
-%						when "11"|"01" =>
-%					v(ind(mi_done, 2)) <= std_logic_vector(
-%						unsigned(c)+unsigned(d));
-%						when "00" =>
-%					v(ind(mi_done, 0)) <= std_logic_vector(
-%						unsigned(a)+unsigned(b)+unsigned(x));
-%						when "10" =>
-%					v(ind(mi_done, 0)) <= std_logic_vector(
-%						unsigned(a)+unsigned(b)+unsigned(y));
-%						when others =>
-%					end case;
-%
-%					state <= STATE_MIX_B;
-%				when STATE_MIX_B =>
-%					--xor's and shifts as defined by blake2b
-%					case mio_left is
-%						when "00" =>
-%					v(ind(mi_done,3)) <= std_logic_vector(
-%						unsigned(d xor a) ror 32);
-%						when "11" =>
-%					v(ind(mi_done,1)) <= std_logic_vector(
-%						unsigned(b xor c) ror 24);
-%						when "10" =>
-%					v(ind(mi_done,3)) <= std_logic_vector(
-%						unsigned(d xor a) ror 16);
-%						when "01" =>
-%					v(ind(mi_done,1)) <= std_logic_vector(
-%						unsigned(b xor c) ror 63);
-%						when others =>
-%					end case;
-%
-%					--last mix
-%					if mi_done = 7 and mio_left = "01" then
-%						--also last compression
-%						if ci_done = 11 then
-%							--also last chunk
-%							if seen_last = '1' then
-%								state <=
-%								STATE_DONE;
-%							else
-%								state <=
-%								STATE_MIX_H;
-%							end if;
-%							--ready to receive a new chunk
-%							compress_ready <= '1';
-%						else
-%							--next compression
-%							state <= STATE_COMPRESS;
-%							ci_done <=
-%								ci_done + 1;
-%						end if;
-%					else
-%						if mio_left = "01" then
-%							mi_done <=
-%								mi_done +1;
-%						end if;
-%						state <= STATE_MIX_A;
-%					end if;
-%					mio_left <= std_logic_vector(unsigned(mio_left) + 3);
-%				when STATE_DONE =>
-%					--write output
-%					for i in 0 to 7 loop
-%						hash(i*64+63 downto i*64) <= h(i) xor v(i) xor v(i+8);
-%					end loop;
-%					valid_out <= '1';
-%					compressed_bytes <= (others => '0');
-%					state <= STATE_IDLE;
-%				when STATE_MIX_H =>
-%					state <= STATE_WAIT;
-%					--mix into h
-%					for i in 0 to 7 loop
-%						h(i) <= h(i) xor v(i) xor v(i+8);
-%					end loop;
-%				when others =>
-%					state <= STATE_IDLE;
-%			end case;
-%		end if;
-%	end process;
-%
-%\end{lstlisting}
-%
-%\lipsum[2]
 %
 %----------------------------------------------------------------------------
 %
-\section{Functional Verification}
+\section{Functional verification}
 \label{sec:functional-verification}
 
 In order to verify that the \emph{BLAKE2b} specification was correctly
@@ -881,117 +665,6 @@ NOTE: In order to read the hash values from \emph{hashes.txt}, we need to
 convert the values from hexadecimal to \emph{std_logic_vector}. We used the
 \emph{ASCII_2_STD} function \todo{from the XXX library}.
 
-% This can be seen in the \Cref{code:testing}.
-
-%\begin{lstlisting}[style = vhdl,caption = {Test bench process for verifying the hardware implementation using the reference implementation in C},label = {code:testing},]
-%stimuli : process
-%		type char_file_t is file of character;
-%		file message_file : TEXT open read_mode is "messages.txt";
-%		file hash_file : TEXT open read_mode is "hashes.txt";
-%		variable line_buffer : line;
-%		variable value_in : std_logic_vector(64*8-1 downto 0);
-%		variable char_value_1 : std_logic_vector(7 downto 0);
-%		variable char_value_2 : std_logic_vector(7 downto 0);
-%		variable read_ok : boolean;
-%		variable current_char : character;
-%		variable counter : integer;
-%	begin
-%
-%		--always generate 64-byte hashes
-%		hash_len <= 64;
-%		last_chunk <= '0';
-%
-%		--start with reset
-%		reset <= '1';
-%		wait for 10 ns;
-%		reset <= '0';
-%		wait for 5 ns;
-%
-%		counter := 0;
-%		message <= (others => '0');
-%		while not endfile(message_file) loop
-%			counter := 0;
-%			message <= (others => '0');
-%			wait for period;
-%
-%			--read single line
-%			readline(message_file, line_buffer);
-%			--message length equals line length
-%			message_len <= line_buffer'length;
-%
-%			for i in 0 to line_buffer'length-1 loop
-%				--read one byte of data and write it to message
-%				--if message is filled up, send it to the entity
-%				--and start over
-%				if counter = 128 then
-%					wait for period;
-%					last_chunk <= '0';
-%					valid_in <= '1';
-%					wait for period;
-%					valid_in <= '0';
-%
-%					counter := 0;
-%					message <= (others => '0');
-%					wait for period*835;
-%				end if;
-%
-%				read(line_buffer, current_char);
-%				char_value_1 := std_logic_vector(to_unsigned(
-%					character'pos(current_char),8));
-%				message(counter*8+7 downto counter*8) <=
-%					char_value_1;
-%				counter := counter + 1;
-%			end loop;
-%
-%			--send the remaining bytes as last chunk
-%			wait for period;
-%			last_chunk <= '1';
-%			valid_in <= '1';
-%			wait for period;
-%			valid_in <= '0';
-%			wait for period*835;
-%
-%			readline(hash_file, line_buffer);
-%			--report "line " & line_buffer.all;
-%			
-%			--read hash file in hex and compare with the output
-%			--generated by the entity
-%			counter := 0;
-%			value_in := (others => '0');
-%			for i in 0 to 63 loop
-%				read(line_buffer, current_char);
-%				char_value_1 := std_logic_vector(to_unsigned(
-%					character'pos(current_char),8));
-%				read(line_buffer, current_char);
-%				char_value_2 := std_logic_vector(to_unsigned(
-%					character'pos(current_char),8));
-%				value_in(counter*8+7 downto counter*8) :=
-%					ASCII_2_VEC(char_value_1) &
-%					ASCII_2_VEC(char_value_2);
-%				counter := counter + 1;
-%			end loop;
-%
-%			--report "valu " & to_hstring(value_in);
-%			--report "hash " & to_hstring(hash);
-%
-%			if value_in = hash then
-%				report "[ OK] HASH correct";
-%			else
-%				report "[NOK] HASH incorrect";
-%			end if;
-%		end loop;
-%
-%		ended <= '1';
-%
-%		wait;
-%	end process;
-%
-%\end{lstlisting}
-
-%\Cref{fig:signaling} shows the wave forms and state transitions for the case
-%when the next message block is to be received. The wave form diagram also shows
-%the counters for mixing rounds and mixing operations.
-%
 \Cref{fig:timing} shows the situation where a message block has been fully
 compressed and a new message block is ready to be compressed (i.e., the round
 counter \emph{ci_done} is `11', and the state is \mbox{STATE_WAIT}).
@@ -1050,21 +723,21 @@ values for the same input messages hashed with BLAKE2s.
 	\hline
 	Input message & Hash & Hash length \\
 	\hline
-	\texttt{\small{}Message}
+	\texttt{\footnotesize{}Message}
 	& \makecell[cc]{%
-		\texttt{\small{}547ee071 8a19d53f df9f6123 8f31c139} \\
-		\texttt{\small{}1979e95a 191505ba aa821805 1c4702d6} \\
-		\texttt{\small{}f95d4312 d5c268f0 c6b4aa98 787dd91e} \\
-		\texttt{\small{}3296ea3c d6d94833 fdfd5bae 39656b3c} \\
+		\texttt{\footnotesize{}547ee071 8a19d53f df9f6123 8f31c139} \\
+		\texttt{\footnotesize{}1979e95a 191505ba aa821805 1c4702d6} \\
+		\texttt{\footnotesize{}f95d4312 d5c268f0 c6b4aa98 787dd91e} \\
+		\texttt{\footnotesize{}3296ea3c d6d94833 fdfd5bae 39656b3c} \\
 	}
 	& 64 bytes \\
 	\hline
-	\texttt{\small{}Massage} &
+	\texttt{\footnotesize{}Massage} &
 	\makecell[cc]{%
-		\texttt{\small{}566cb134 f53e14f2 7b49fcf5 45f4c71c} \\
-		\texttt{\small{}4486c824 c0fe5359 c61df882 d610c38e} \\
-		\texttt{\small{}88b25a1a 3e5790c4 b0099c9f 55f0ebc6} \\
-		\texttt{\small{}71cf2aec 4a9b9134 d3f05b9e 8eee1612} \\
+		\texttt{\footnotesize{}566cb134 f53e14f2 7b49fcf5 45f4c71c} \\
+		\texttt{\footnotesize{}4486c824 c0fe5359 c61df882 d610c38e} \\
+		\texttt{\footnotesize{}88b25a1a 3e5790c4 b0099c9f 55f0ebc6} \\
+		\texttt{\footnotesize{}71cf2aec 4a9b9134 d3f05b9e 8eee1612} \\
 	}
 	& 64 bytes \\
 	\hline
@@ -1081,17 +754,17 @@ values for the same input messages hashed with BLAKE2s.
 	\hline
 	Input message & Hash & Hash length \\
 	\hline
-	\texttt{\small{}Message}
+	\texttt{\footnotesize{}Message}
 	& \makecell[cc]{%
-		\texttt{\small{}94bb1d33 b1ae1a65 aa1dad9b ade6c30b} \\
-		\texttt{\small{}14f6ba03 0b6ab5e5 c9756aba 26b77219} \\
+		\texttt{\footnotesize{}94bb1d33 b1ae1a65 aa1dad9b ade6c30b} \\
+		\texttt{\footnotesize{}14f6ba03 0b6ab5e5 c9756aba 26b77219} \\
 	}
 	& 32 bytes \\
 	\hline
-	\texttt{\small{}Massage} &
+	\texttt{\footnotesize{}Massage} &
 	\makecell[cc]{%
-		\texttt{\small{}f153acb5 47c9d8a3 199c4820 3d488df4} \\
-		\texttt{\small{}82cc5a21 e760251a b7f090b7 7bdf8b5f} \\
+		\texttt{\footnotesize{}f153acb5 47c9d8a3 199c4820 3d488df4} \\
+		\texttt{\footnotesize{}82cc5a21 e760251a b7f090b7 7bdf8b5f} \\
 	}
 	& 32 bytes \\
 	\hline
@@ -1106,7 +779,7 @@ in  \Cref{RTLsynthesis}.
 %
 %----------------------------------------------------------------------------
 %
-\section{Formal Verification}
+\section{Formal verification}
 \label{sec:formal-verification}
 
 \todo{I put this here as a future point. Formal verification of a
@@ -1115,7 +788,7 @@ that in next year's lab.}
 %
 %----------------------------------------------------------------------------
 %
-\section{Resource Allocation}
+\section{Resource allocation}
 \label{sec:resource-allocation}
 
 \todo{Here we should put tables for different targets (BLAKE2b, BLAKE2s with
