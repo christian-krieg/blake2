@@ -338,6 +338,12 @@
 %
 %----------------------------------------------------------------------------
 %
+% Package for logos (e.g., the BibTeX logo)
+%
+\usepackage{dtk-logos}
+%
+%----------------------------------------------------------------------------
+%
 % Use \textsubscript
 %
 \usepackage{fixltx2e}
@@ -354,8 +360,6 @@
 % Use appendices
 %
 \usepackage[titletoc]{appendix}
-
-
 %
 %----------------------------------------------------------------------------
 %
@@ -428,6 +432,68 @@ specified in \autocite{irtf-cfrg-argon2-03}. The \emph{Argon2} function should
 be implemented targeting \emph{Nexyx 4 DDR} board.
 \end{abstract}
 \end{titlepage}
+%
+%----------------------------------------------------------------------------
+%
+%\vspace*{27em}
+
+Copyright (C) 2018 Christian Krieg, Benedikt Tutzer, Dinka Milovancev
+
+This work was originally created as part of the Digital Integrated Circuits
+Lab at the Institute of Computer Technology (ICT), Vienna University of
+Technology (TU Wien). If you find this work useful, please cite it using
+the following \BibTeX{ } entry:
+
+\vspace{1em}
+
+\begin{lstlisting}[%
+%	language   = TeX,%
+	breaklines = true,%
+	basicstyle = \ttfamily\footnotesize,%
+%	columns    = flexible,%
+	keepspaces = true,
+	frame      = single,%
+]
+@TechReport{Krieg2018,
+  author      = {Christian Krieg and Benedikt Tutzer and Dinka Milovancev},
+  title       = {BLAKE2 cryptographic hash and message authentication code (MAC) -- An implementation in VHDL},
+  institution = {Institute of Computer Technology, Vienna University of Technology},
+  year        = {2018},
+  type        = {techreport},
+  address     = {Gusshausstrasse 27--29 / 384, 1040 Wien},
+  month       = {June},
+}
+\end{lstlisting}
+
+\vfill
+
+\includegraphics[height=1.5cm]{fig/cc-large.png}
+\includegraphics[height=1.5cm]{fig/by-large.png}
+
+
+This documentation is licensed under the following license:
+Attribution 4.0 International (CC BY 4.0)
+
+\vspace{3em}
+
+You are free to:
+
+\begin{enumerate}
+    \item Share --- Copy and redistribute the material in any medium or format
+    \item Adapt --- Remix, transform, and build upon the material for any purpose,
+			even commercially.
+\end{enumerate}
+
+This license is acceptable for Free Cultural Works.
+
+The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+The entire license text is available at:
+\href{https://creativecommons.org/licenses/by/4.0/legalcode}
+	{https://creativecommons.org/licenses/by/4.0/legalcode}
+
+
+\pagebreak
 %
 %----------------------------------------------------------------------------
 %
