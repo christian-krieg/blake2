@@ -509,8 +509,16 @@ The entire license text is available at:
 \section{Overview}
 \label{sec:overview}
 
-\todo{Include a block diagram of the top-level entities here, ideally
+\done{Include a block diagram of the top-level entities here, ideally
 created with TikZ.}
+
+\begin{figure}[tb]
+	\centering
+	\small
+	\input{fig/block.tex}
+	\caption{BLAKE2 entity}
+	\label{fig:blake-entity}
+\end{figure}
 
 The \emph{BLAKE2} hash function comes in two variants: \emph{BLAKE2b} for
 64-bit platforms and \emph{BLAKE2s} for smaller architectures.
@@ -518,11 +526,13 @@ The \emph{BLAKE2} hash function comes in two variants: \emph{BLAKE2b} for
 We implemented both \emph{BLAKE2b} and \emph{BLAKE2s} based on RFC 7693~%
 \autocite{rfc7693}.	
 %
+\Cref{fig:blake-entity} shows a block diagram of the BLAKE2 entity.
+%
 The input to \emph{BLAKE2} is the message data (message
 length goes from 1 to $2^{128}$ bytes) and the output is the message digest or
 simply hash value (hash length goes from 1 to 64 bytes).
 %
-According to the reference implementation~\autocite{REF}, the input message is
+According to the reference implementation~\autocite[16-26]{rfc7693}, the input message is
 divided into $N$ 128 byte message blocks $m_i$; if a secret key is used, it is
 used as the first message block. In our design specification, the secret key is
 not used. \todo{Is it possible to enable key usage? This would be very cool,
@@ -583,7 +593,7 @@ schedule is defined by 10 possible permutations $\sigma_0\dots\sigma_9$ (hard
 coded into design as two dimensional \emph{SIGMA} array).
 %
 Mixing the messages requires an additional mixing function that mixes two
-64-bit words from message $m_i$ into hash state $h_i$. We an auxiliary
+64-bit words from message $m_i$ into hash state $h_i$. We an use auxiliary
 local $4\times{}4$ working vector $v[0..15]$ in the  mixing function:
 \[
    v=
@@ -604,7 +614,7 @@ reconstruct the input data from the hash value.
 %
 We verify the quality of our \emph{BLAKE2b} implementation by comparing the
 outputs to thte outputs produced by the reference implementation,
-available as C code in RFC~7693 \autocite[16-26]{rfc7693}.
+available as C code in RFC~7693~\autocite[16-26]{rfc7693}.
 %
 %----------------------------------------------------------------------------
 %

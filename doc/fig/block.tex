@@ -1,0 +1,26 @@
+\begin{tikzpicture}[
+	every node/.append style ={
+		outer sep = 0,
+		inner sep = 0,
+	},
+]
+
+	\begin{scope}[anchor=east, every node/.append style={xshift=-.25cm, yshift=.6em}]
+		\draw (0,0) -- (2,0) node {clk}; 
+		\draw[yshift=-.5cm] (0,0) -- (2,0) node {hash\_len}; 
+		\draw[yshift=-1cm] (0,0) -- (2,0) node {last\_chunk}; 
+		\draw[yshift=-1.5cm] (0,0) -- (2,0) node {message}; 
+		\draw[yshift=-2cm] (0,0) -- (2,0) node {message\_len}; 
+		\draw[yshift=-2.5cm] (0,0) --  (2,0)node {reset}; 
+		\draw[yshift=-3cm] (0,0) -- (2,0) node {valid\_in}; 
+	\end{scope}
+
+	\node (core) at (4,.5) [draw, anchor=north,inner sep=0, outer sep=0, minimum width=4cm, minimum height =4cm]{BLAKE2};
+
+	\begin{scope}[anchor=west, every node/.append style={xshift=.25cm, yshift=.6em}]
+		\draw (6,0) node {compress\_ready} --  (8,0); 
+		\draw[yshift=-.5cm] (6,0) node {hash}  -- (8,0); 	
+		\draw[yshift=-1cm] (6,0) node {valid\_out}  -- (8,0); 	
+	\end{scope}
+
+\end{tikzpicture}
