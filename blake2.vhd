@@ -58,7 +58,7 @@ entity blake2 is
 		--
 		-- Maximal length of the hash
 		--
-		MAX_HASH_LENGTH: integer range 1 to BASE_WIDTH := 64;
+		MAX_HASH_LENGTH: integer range 1 to 2147483647 := 64;
 
 		--
 		-- Maximal length of input messages
@@ -250,7 +250,7 @@ architecture behav of blake2 is
 
 begin
 
-	process(clk)
+	process(clk, reset)
 
 		--
 		-- Helper variables for the mixing operations. These correspond to the
@@ -291,11 +291,12 @@ begin
 			c := v(ind(mi_done, 2));
 			d := v(ind(mi_done, 3));
 			help_sigma_x := SIGMA(ci_done, ind(mi_done,4));
-			x := current_chunk(help_sigma_x*BASE_WIDTH+BASE_WIDTH-1 downto
-				help_sigma_x*BASE_WIDTH);
 			help_sigma_y := SIGMA(ci_done, ind(mi_done,5));
-			y := current_chunk(help_sigma_y*BASE_WIDTH+BASE_WIDTH-1 downto
-				help_sigma_y*BASE_WIDTH);
+
+			for i in 0 to BASE_WIDTH - 1 loop
+				x(i) := current_chunk(help_sigma_x*BASE_WIDTH+i);
+				y(i) := current_chunk(help_sigma_y*BASE_WIDTH+i);
+			end loop;
 
 			case(state) is
 

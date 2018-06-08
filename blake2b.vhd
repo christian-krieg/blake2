@@ -107,7 +107,7 @@ architecture behav of blake2b is
 			BASE_WIDTH: integer range 32 to 64 := 64;
 			COMP_ROUNDS: integer range 1 to 64 := 12;
 			BLOCK_SIZE: integer range 1 to 512 := 128;
-			MAX_HASH_LENGTH: integer range 1 to BASE_WIDTH := 64;
+			MAX_HASH_LENGTH: integer range 1 to 2147483647 := 64;
 			MAX_MESSAGE_LENGTH: integer := 2147483647
 
 		);
