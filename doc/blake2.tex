@@ -538,7 +538,7 @@ hashed in total, the length of the hash can be chosen by setting
 After sending one chunk, wait for \emph{compress_ready} to be `HIGH' before
 sending the next chunk. When the last chunk is sent, the input
 \emph{last_chunk} needs to be set to `HIGH'. After the last chunk is
-encoded, the output `valid_out' is raised and the hash is available at the
+encoded, the output \emph{valid_out} is raised and the hash is available at the
 \emph{hash} output.
 %
 %----------------------------------------------------------------------------
@@ -556,7 +556,86 @@ encoded, the output `valid_out' is raised and the hash is available at the
 	\label{fig:blake-entity}
 \end{figure}
 
+\begin{table}[tb]
 
+	\centering
+	\caption{User interface for the BLAKE2 cores}	
+	\label{tbl:blake2-ui}
+	\renewcommand{\arraystretch}{2}
+	\begin{tabular}{l|c|c|m{3cm}}
+	\hline
+	\textbf{Port}
+	& \textbf{Input/Output}
+	&	\begin{minipage}[c]{3cm}%
+				\textbf{Default value} \\
+				(BLAKE2b/BLAKE2s)%
+			\end{minipage}%
+	& \textbf{Description}
+	\\\hline
+
+	clk
+	& Input
+	& ---
+	& Clock signal
+	\\\hline
+
+	hash_len
+	& Input
+	& (32/64)
+	&	Length of hash in bytes
+	\\\hline
+
+	last_chunk
+	& Input
+	& ---
+	&	Signal to indicate that last message chunk is hashed%
+	\\\hline
+
+	message
+	& Input
+	& ---
+	&	Input message to be hashed
+	\\\hline
+
+	message_len
+	& Input
+	& max. 2147483647
+	& Total length of input message in bytes
+	\\\hline
+
+	reset
+	& Input
+	& ---
+	& Reset signal
+	\\\hline
+
+	valid_in
+	& Input
+	& ---
+	&	When `HIGH', the data on the \emph{message} input is processed
+	\\\hline
+
+	hash
+	& Output
+	& ---
+	&	The generated hash value
+	\\\hline
+
+	compress_ready
+	& Output
+	& ---
+	&	When `HIGH', new data can be provided to the \emph{message} input
+	\\\hline
+
+	valid_out
+	& Output
+	& ---
+	&	When `HIGH', the data at the \emph{hash} output is valid
+	\\\hline
+
+	\end{tabular}
+
+\end{table}
 %
 %----------------------------------------------------------------------------
 %
@@ -1075,7 +1154,7 @@ the input parameter is the whole message whose length can have between 1
 and $2^{128}$ bytes.
 %
 This long message is intended to be divided into 128-byte message blocks
-during hash computation. Since the VHDL cannot support such large input
+during hash computation. Since VHDL does not support such large input
 vectors, we decided to send the message block by block.
 %
 This way, our data input is 128 bytes long, and we introduced additional
