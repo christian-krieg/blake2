@@ -523,9 +523,9 @@ We implemented both \emph{BLAKE2b} and \emph{BLAKE2s} based on RFC 7693~%
 \section{Usage}
 \label{sec:usage}
 
-\todo{Put in here typical usage examples the can be copied/pasted and ready
+\done{Put in here typical usage examples the can be copied/pasted and ready
 to be used. I think it would be cool to have this for all the variants given
-in \Cref{sec:resource-allocation}}.
+in \Cref{sec:resource-allocation}.}
 
 Split the message to be hashed into chunks of \emph{BLOCK_SIZE} bytes. Send
 them to the entity sequentially by setting the message port and raising
@@ -540,6 +540,51 @@ sending the next chunk. When the last chunk is sent, the input
 \emph{last_chunk} needs to be set to `HIGH'. After the last chunk is
 encoded, the output \emph{valid_out} is raised and the hash is available at the
 \emph{hash} output.
+
+\begin{lstlisting}[%
+	language   = VHDL,%
+	breaklines = true,%
+	basicstyle = \ttfamily\footnotesize,%
+%	columns    = flexible,%
+%	keepspaces = true,
+	tabsize    = 4,
+	frame      = single,%
+	caption    = {Usage example for the BLAKE2s core. Instantiating a BLAKE2b
+								is similar.},
+	label      = lst:usage
+]
+architecture behav of example is
+	component blake2s is
+		port (
+			reset          : in  std_logic;
+			clk            : in  std_logic;
+			message        : in  std_logic_vector(64 * 8 - 1 downto 0);
+			hash_len       : in  integer range 1 to 32;
+			valid_in       : in  std_logic;
+			message_len    : in  integer range 0 to 1032;
+			compress_ready : out std_logic;
+			last_chunk     : in  std_logic;
+			valid_out      : out std_logic;
+			hash           : out std_logic_vector(32 * 8 - 1 downto 0)
+		);
+	end component;
+begin
+	hash : blake2s
+	port map (
+		reset          => reset,
+		clk            => clk,
+		message        => message,
+		valid_in       => valid_in,
+		message_len    => message_len,
+		hash_len       => hash_len,
+		compress_ready => compress_ready,
+		last_chunk     => last_chunk,
+		valid_out      => valid_out,
+		hash           => hash
+	);
+...
+end behav;
+\end{lstlisting}
 %
 %----------------------------------------------------------------------------
 %
@@ -612,7 +657,7 @@ encoded, the output \emph{valid_out} is raised and the hash is available at the
 	valid_in
 	& Input
 	& ---
-	&	When `HIGH', the data on the \emph{message} input is processed
+	&	When `HIGH', data on the \emph{message} input is processed
 	\\\hline
 
 	hash
