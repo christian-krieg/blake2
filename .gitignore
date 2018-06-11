@@ -24,4 +24,6 @@ hashes*
 *.run.xml
 *.pdf
 *.sw*
+*.blg
+*.bbl
 *.bib.bak
