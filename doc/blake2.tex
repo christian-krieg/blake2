@@ -457,7 +457,7 @@ the following \BibTeX{ } entry:
 @TechReport{Krieg2018,
   author      = {Christian Krieg and Benedikt Tutzer and Dinka Milovancev},
   title       = {BLAKE2 cryptographic hash and message authentication code (MAC) -- An implementation in VHDL},
-  institution = {Institute of Computer Technology, Vienna University of Technology},
+  institution = {Institute of Computer Technology, Vienna University of Technology (TU Wien)},
   year        = {2018},
   type        = {techreport},
   address     = {Gusshausstrasse 27--29 / 384, 1040 Wien},
@@ -523,9 +523,23 @@ We implemented both \emph{BLAKE2b} and \emph{BLAKE2s} based on RFC 7693~%
 \section{Usage}
 \label{sec:usage}
 
-\todo{Put in here typical usage examples the can be copied/pasted and ready to be
-used. I think it would be cool to have this for all the variants given in
-\Cref{sec:resource-allocation}}.
+\todo{Put in here typical usage examples the can be copied/pasted and ready
+to be used. I think it would be cool to have this for all the variants given
+in \Cref{sec:resource-allocation}}.
+
+Split the message to be hashed into chunks of \emph{BLOCK_SIZE} bytes. Send
+them to the entity sequentially by setting the message port and raising
+\emph{valid_in} for one clock cycle.
+
+\emph{message_len} needs to be set to the number of bytes that are to be
+hashed in total, the length of the hash can be chosen by setting
+\emph{hash_len}.
+
+After sending one chunk, wait for \emph{compress_ready} to be `HIGH' before
+sending the next chunk. When the last chunk is sent, the input
+\emph{last_chunk} needs to be set to `HIGH'. After the last chunk is
+encoded, the output `valid_out' is raised and the hash is available at the
+\emph{hash} output.
 %
 %----------------------------------------------------------------------------
 %
