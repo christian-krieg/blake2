@@ -817,25 +817,7 @@ values for the same input messages hashed with BLAKE2s.
 	\hline
 	Input message & Hash & Hash length \\
 	\hline
-	\texttt{\footnotesize{}""}
-	& \makecell[cc]{%
-		\texttt{\footnotesize{}786a02f7 42015903 c6c6fd85 2552d272} \\
-		\texttt{\footnotesize{}912f4740 e1584761 8a86e217 f71f5419} \\
-		\texttt{\footnotesize{}d25e1031 afee5853 13896444 934eb04b} \\
-		\texttt{\footnotesize{}903a685b 1448b755 d56f701a fe9be2ce} \\
-	}
-	& 64 bytes \\
-	\hline
-	\texttt{\footnotesize{}"X"}
-	& \makecell[cc]{%
-		\texttt{\footnotesize{}37cccdd7 0490de3d 2f7ee48f 8b34e911} \\
-		\texttt{\footnotesize{}ac4d7b17 f5e633f8 03f9b2be 7466633c} \\
-		\texttt{\footnotesize{}868886c9 772ee1fa cf6c49b5 db610365} \\
-		\texttt{\footnotesize{}0981401f 1f3003cb 92666dc6 a71e9fc0} \\
-	}
-	& 64 bytes \\
-	\hline
-	\texttt{\footnotesize{}"abc"}
+	\texttt{\footnotesize{}abc}
 	& \makecell[cc]{%
 		\texttt{\footnotesize{}0981401f 1f3003cb 92666dc6 a71e9fc0} \\
 		\texttt{\footnotesize{}4c212f14 685ac4b7 4b12bb6f dbffa2d1} \\
@@ -844,7 +826,7 @@ values for the same input messages hashed with BLAKE2s.
 	}
 	& 64 bytes \\
 	\hline
-	\texttt{\footnotesize{}"Message"}
+	\texttt{\footnotesize{}Message}
 	& \makecell[cc]{%
 		\texttt{\footnotesize{}547ee071 8a19d53f df9f6123 8f31c139} \\
 		\texttt{\footnotesize{}1979e95a 191505ba aa821805 1c4702d6} \\
@@ -853,7 +835,7 @@ values for the same input messages hashed with BLAKE2s.
 	}
 	& 64 bytes \\
 	\hline
-	\texttt{\footnotesize{}"Massage"} &
+	\texttt{\footnotesize{}Massage} &
 	\makecell[cc]{%
 		\texttt{\footnotesize{}566cb134 f53e14f2 7b49fcf5 45f4c71c} \\
 		\texttt{\footnotesize{}4486c824 c0fe5359 c61df882 d610c38e} \\
@@ -861,6 +843,43 @@ values for the same input messages hashed with BLAKE2s.
 		\texttt{\footnotesize{}71cf2aec 4a9b9134 d3f05b9e 8eee1612} \\
 	}
 	& 64 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}24} \\
+	}
+	& 1 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}2120} \\
+	}
+	& 2 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}0d93575d} \\
+	}
+	& 4 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}184c2242 418d7bc6} \\
+	}
+	& 8 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[cc]{%
+		\texttt{\footnotesize{}ea30fef5 179fa367 0595e817 933e0ce8} \\
+	}
+	& 16 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[cc]{%
+		\texttt{\footnotesize{}8a5efe6b 0c5a8d56 304804e8 aecfae16} \\
+		\texttt{\footnotesize{}2e3799dc 92ad1942 b4bd72c5 2a97f3bd} \\
+	}
+	& 32 bytes \\
 	\hline
 	\end{tabular}
 \end{table}
@@ -873,40 +892,56 @@ values for the same input messages hashed with BLAKE2s.
 	\hline
 	Input message & Hash & Hash length \\
 	\hline
-	\texttt{\footnotesize{}""}
-	& \makecell[cc]{%
-		\texttt{\footnotesize{}69217a30 79908094 e11121d0 42354a7c} \\
-		\texttt{\footnotesize{}1f55b648 2ca1a51e 1b250dfd 1ed0eef9} \\
-	}
-	& 32 bytes \\
-	\hline
-	\texttt{\footnotesize{}"X"}
-	& \makecell[cc]{%
-		\texttt{\footnotesize{}f6d5f27d 6cb3d060 724030d9 83c95a6e} \\
-		\texttt{\footnotesize{}f9b70b31 a75486db 56f76c26 0e628983} \\
-	}
-	& 32 bytes \\
-	\hline
-	\texttt{\footnotesize{}"abc"}
+	\texttt{\footnotesize{}abc}
 	& \makecell[cc]{%
 		\texttt{\footnotesize{}508c5e8c 327c14e2 e1a72ba3 4eeb452f} \\
 		\texttt{\footnotesize{}37458b20 9ed63a29 4d999b4c 86675982} \\
 	}
 	& 32 bytes \\
 	\hline
-	\texttt{\footnotesize{}"Message"}
+	\texttt{\footnotesize{}Message}
 	& \makecell[cc]{%
 		\texttt{\footnotesize{}94bb1d33 b1ae1a65 aa1dad9b ade6c30b} \\
 		\texttt{\footnotesize{}14f6ba03 0b6ab5e5 c9756aba 26b77219} \\
 	}
 	& 32 bytes \\
 	\hline
-	\texttt{\footnotesize{}"Massage"} &
+	\texttt{\footnotesize{}Massage} &
 	\makecell[cc]{%
 		\texttt{\footnotesize{}f153acb5 47c9d8a3 199c4820 3d488df4} \\
 		\texttt{\footnotesize{}82cc5a21 e760251a b7f090b7 7bdf8b5f} \\
 	}
 	& 32 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}fb} \\
+	}
+	& 1 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}46ce} \\
+	}
+	& 2 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}57c3d825} \\
+	}
+	& 4 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}4a690e84 7edb95d8} \\
+	}
+	& 8 bytes \\
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[cc]{%
+		\texttt{\footnotesize{}6e5cca08 1ec78d57 2b50cd1e efd754d1} \\
+	}
+	& 16 bytes \\
 	\hline
 	\end{tabular}
 \end{table}

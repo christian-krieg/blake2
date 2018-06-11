@@ -22,3 +22,5 @@ hashes*
 *.ist
 *.out
 *.run.xml
+*.pdf
+*.swp
