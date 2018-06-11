@@ -64,7 +64,7 @@ architecture behav of tb_blake2s is
 			message        : in  std_logic_vector(64 * 8 - 1 downto 0);
 			hash_len       : in  integer range 1 to 32;
 			valid_in       : in  std_logic;
-			message_len    : in  integer range 0 to 1032;
+			message_len    : in  integer range 0 to 2147483647;
 			compress_ready : out std_logic;
 			last_chunk     : in  std_logic;
 			valid_out      : out std_logic;
@@ -78,7 +78,7 @@ architecture behav of tb_blake2s is
 	signal message        : std_logic_vector(64 * 8 - 1 downto 0);
 	signal hash_len       : integer range 1 to 32;
 	signal valid_in       : std_logic;
-	signal message_len    : integer range 0 to 1032;
+	signal message_len    : integer range 0 to 2147483647;
 	signal compress_ready : std_logic;
 	signal last_chunk     : std_logic;
 	signal valid_out      : std_logic;

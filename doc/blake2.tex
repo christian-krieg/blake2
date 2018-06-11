@@ -172,6 +172,13 @@
   firstplural={message authentication codes (MACs)},
 }
 %
+\newglossaryentry{rtl}{
+  name={RTL},
+  description={Register-transfer level},
+  text={RTL},
+  first={register-transfer level (RTL)},
+}
+%
 %\newglossaryentry{}{
 %  name={},
 %  description={},
@@ -596,7 +603,7 @@ architecture behav of example is
 			message        : in  std_logic_vector(64 * 8 - 1 downto 0);
 			hash_len       : in  integer range 1 to 32;
 			valid_in       : in  std_logic;
-			message_len    : in  integer range 0 to 1032;
+			message_len    : in  integer range 0 to 2147483647;
 			compress_ready : out std_logic;
 			last_chunk     : in  std_logic;
 			valid_out      : out std_logic;
@@ -635,7 +642,7 @@ end behav;
 	\label{fig:blake-entity}
 \end{figure}
 
-The functioality of BLAKE2s and BLAKE2b is encapsulated such that it is
+The functionality of BLAKE2s and BLAKE2b is encapsulated such that it is
 transparent to the user to instantiate these cores. The ports to the
 BLAKE2s and BLAKE2b cores are illustrated in \Cref{fig:blake-entity}.
 \Cref{tbl:blake2-ports} lists the ports with additional information.
@@ -727,7 +734,7 @@ BLAKE2s and BLAKE2b cores are illustrated in \Cref{fig:blake-entity}.
 %
 Internally, generics are used to switch between BLAKE2s and BLAKE2b
 functionality. \Cref{tbl:blake2-generics} lists these generics along with
-value range and default values gfor BLAKE2s and BLAKE2b.
+value range and default valuesfor BLAKE2s and BLAKE2b.
 
 \begin{table}[tb]
 
@@ -808,7 +815,7 @@ used as the first message block.
 %not used. \todo{Is it possible to enable key usage? This would be very cool,
 %because then this core can be used to create \glspl{mac}.}
 %
-The hash value is iteratively computed as in the following pseudo-code:
+The hash value is iteratively computed as shown in \Cref{alg:bbs}.
 
 \begin{algorithm}
 \setstretch{1.2}
@@ -856,14 +863,14 @@ The hash value is iteratively computed as in the following pseudo-code:
 \end{algorithm}
 
 The main challenge in implementing the algorithm is the compression function
-which is called for each message block.
+which is applied to each message block.
 %
-The message block is mixed in 12 rounds, and in each round, the message word
+The message block is mixed in 10--12 rounds, and in each round, the message word
 schedule is defined by 10 possible permutations $\sigma_0\dots\sigma_9$ (hard
 coded into design as two dimensional \emph{SIGMA} array).
 %
 Mixing the messages requires an additional mixing function that mixes two
-64-bit words from message $m_i$ into hash state $h_i$. We an use auxiliary
+64-bit words from message $m_i$ into hash state $h_i$. We use an auxiliary
 local $4\times{}4$ working vector $v[0..15]$ in the  mixing function:
 \[
    v=
@@ -913,6 +920,8 @@ the following states (and state transitions):
 		The counter which counts the number of mixing rounds \emph{ci_done} is reset
 		to zero (there should be 10 or 12 rounds mixing a message). The next state is
 		\mbox{STATE_COMPRESS}.
+
+	\pagebreak
 
 	\item STATE_COMPRESS
 
@@ -1028,10 +1037,10 @@ Compressing of one 1024-bit message block consumes 835 clock cycles.
 \begin{figure}[tb]
 	\centering
 	\includegraphics[width=\textwidth]{waveform2.eps};
-	\caption{Simulation results for BLAKE2b hash function: state transitions
+	\caption{Simulation results for BLAKE2b hash function
 		\done{Can we draw this in TikZ (using the TikZ timing package)? Adapting
 			\Cref{fig:timing} may be the most straight-forward approach.}}
-	\label{fig:signaling}
+	\label{fig:timing}
 \end{figure}
 %
 %\begin{figure}[tb]
@@ -1217,11 +1226,11 @@ values for the same input messages hashed with BLAKE2s.
 
 \end{table}
 
-Since this design is to be used as a module of the larger \emph{Argon2}
-design, there were no ports to be mapped to the hardware and therefore placing
-and routing of the design was not possible, but the RTL synthesis and
-optimization was successfully completed. The RTL optimization report is shown
-in  \Cref{RTLsynthesis}.
+%Since this design is to be used as a module of the larger \emph{Argon2}
+%design, there were no ports to be mapped to the hardware and therefore placing
+%and routing of the design was not possible, but the RTL synthesis and
+%optimization was successfully completed.
+\Cref{RTLsynthesis} shows the \gls{rtl} optimization report.
 %
 %----------------------------------------------------------------------------
 %
@@ -1234,6 +1243,40 @@ in  \Cref{RTLsynthesis}.
 %
 %----------------------------------------------------------------------------
 %
+\section{Additional notes}
+\label{sec:additional-notes}
+
+For the reference implementation given in RFC 7693~\autocite{rfc7693},
+the input parameter is the whole message whose length can have between 1
+and $2^{128}$ bytes.
+%
+This long message is intended to be divided into 128-byte message blocks
+during hash computation. Since VHDL does not support such large input
+vectors, we decided to send the message block by block.
+%
+This way, our data input is 128 bytes long, and we introduced additional
+information regarding the message length (\emph{message_len} input).
+%
+%The maximum message length was specified to be 1032 bytes since this is the
+%maximum length needed by \emph{Argon2}.\todo{Is this still valid?}
+%
+For every message block we need the information of the main module whether there
+is a new message block available (signal \emph{valid_in} goes high) and the flag
+register for the last message block \emph{last_chunk} (high if the last message
+block is sent).
+%
+For the output we provide handshaking signals \emph{compress_ready}
+and $valid\_out$, the user of our package must make sure that
+\emph{compress_ready} is high before sending a new message block, and the
+output hash can be stored when \emph{valid_out} is high.
+%
+The input messages in \texttt{messages.txt} file can be empty message. However
+messages are not allowed to contain whitespace. \done{Why not? This is a very
+strong constraint! We should definitely allow whitespace.}
+%
+%----------------------------------------------------------------------------
+%
+\pagebreak
 \section{Resource allocation}
 \label{sec:resource-allocation}
 
@@ -1289,38 +1332,6 @@ Finished RTL Hierarchical Component Statistics
 
 \end{lstlisting}
 %
-%----------------------------------------------------------------------------
-%
-\section{Additional notes}
-\label{sec:additional-notes}
-
-For the reference implementation given in RFC 7693~\autocite{rfc7693},
-the input parameter is the whole message whose length can have between 1
-and $2^{128}$ bytes.
-%
-This long message is intended to be divided into 128-byte message blocks
-during hash computation. Since VHDL does not support such large input
-vectors, we decided to send the message block by block.
-%
-This way, our data input is 128 bytes long, and we introduced additional
-information regarding the message length (\emph{message_len} input).
-%
-%The maximum message length was specified to be 1032 bytes since this is the
-%maximum length needed by \emph{Argon2}.\todo{Is this still valid?}
-%
-For every message block we need the information of the main module whether there
-is a new message block available (signal \emph{valid_in} goes high) and the flag
-register for the last message block \emph{last_chunk} (high if the last message
-block is sent).
-%
-For the output we provide handshaking signals \emph{compress_ready}
-and $valid\_out$, the user of our package must make sure that
-\emph{compress_ready} is high before sending a new message block, and the
-output hash can be stored when \emph{valid_out} is high.
-%
-The input messages in \texttt{messages.txt} file can be empty message. However
-messages are not allowed to contain whitespace \done{Why not? This is a very
-strong constraint! We should definitely allow whitespace.}.
 %----------------------------------------------------------------------------
 %
 \section{Concluding remarks}
