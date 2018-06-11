@@ -390,7 +390,7 @@
 
 	\begin{center}
 
-	\includegraphics[height=2cm]{fig/logo-tu.png}%
+	\includegraphics[height=2cm]{fig/logo-tu-bw.png}%
 	\hfill{}%
 	\includegraphics[height=2cm]{fig/logo-ict.png}%
 	
@@ -506,19 +506,42 @@ The entire license text is available at:
 %
 %----------------------------------------------------------------------------
 %
-\section{Overview}
-\label{sec:overview}
+\section{Features}
+\label{sec:features}
 
-\done{Include a block diagram of the top-level entities here, ideally
-created with TikZ.}
+\todo{Include a table here that holds key information that is useful for a
+potential user! Such as a data sheet does.}
 
-\begin{figure}[tb]
+The \emph{BLAKE2} hash function comes in two variants: \emph{BLAKE2b} for
+64-bit platforms and \emph{BLAKE2s} for smaller architectures.
+%
+We implemented both \emph{BLAKE2b} and \emph{BLAKE2s} based on RFC 7693~%
+\autocite{rfc7693}.	
+%
+%----------------------------------------------------------------------------
+%
+\section{User Interface}
+\label{sec:user-interface}
+%
+\Cref{fig:blake-entity} shows a block diagram of the BLAKE2 entity.
+
+\begin{figure}[h!]
 	\centering
 	\small
 	\input{fig/block.tex}
 	\caption{BLAKE2 entity}
 	\label{fig:blake-entity}
 \end{figure}
+
+
+%
+%----------------------------------------------------------------------------
+%
+\section{Functional description}
+\label{sec:implementation}
+
+\done{Include a block diagram of the top-level entities here, ideally
+created with TikZ.}
 
 The \emph{BLAKE2} hash function comes in two variants: \emph{BLAKE2b} for
 64-bit platforms and \emph{BLAKE2s} for smaller architectures.
@@ -615,11 +638,6 @@ reconstruct the input data from the hash value.
 We verify the quality of our \emph{BLAKE2b} implementation by comparing the
 outputs to thte outputs produced by the reference implementation,
 available as C code in RFC~7693~\autocite[16-26]{rfc7693}.
-%
-%----------------------------------------------------------------------------
-%
-\section{Implementation}
-\label{sec:implementation}
 
 The \emph{BLAKE2b} hash algorithm is split into eight main operations which
 are implemented as a state machine in \gls{vhdl}. The state machine implements
