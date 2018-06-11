@@ -520,6 +520,15 @@ We implemented both \emph{BLAKE2b} and \emph{BLAKE2s} based on RFC 7693~%
 %
 %----------------------------------------------------------------------------
 %
+\section{Usage}
+\label{sec:usage}
+
+\todo{Put in here typical usage examples the can be copied/pasted and ready to be
+used. I think it would be cool to have this for all the variants given in
+\Cref{sec:resource-allocation}}.
+%
+%----------------------------------------------------------------------------
+%
 \section{User Interface}
 \label{sec:user-interface}
 %
@@ -813,18 +822,53 @@ values for the same input messages hashed with BLAKE2s.
 	\centering
 	\caption{Example hashes and corresponding input messages for BLAKE2b}	
 	\label{tbl:blake2b-hashes}
-	\begin{tabular}{l|l|l}
+	\begin{tabular}{l|l|c}
 	\hline
-	Input message & Hash & Hash length \\
+	\textbf{Input message} & \textbf{Hash} & \textbf{Hash length} \\
+
 	\hline
-	\texttt{\footnotesize{}abc}
-	& \makecell[cc]{%
-		\texttt{\footnotesize{}0981401f 1f3003cb 92666dc6 a71e9fc0} \\
-		\texttt{\footnotesize{}4c212f14 685ac4b7 4b12bb6f dbffa2d1} \\
-		\texttt{\footnotesize{}7d87c539 2aab792d c252d5de 4533cc95} \\
-		\texttt{\footnotesize{}18d38aa8 dbf1925a b92386ed d4009923} \\
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}24} \\
 	}
-	& 64 bytes \\
+	& 1 byte \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}2120} \\
+	}
+	& 2 bytes \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}0d93575d} \\
+	}
+	& 4 bytes \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}184c2242 418d7bc6} \\
+	}
+	& 8 bytes \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[cc]{%
+		\texttt{\footnotesize{}ea30fef5 179fa367 0595e817 933e0ce8} \\
+	}
+	& 16 bytes \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[cc]{%
+		\texttt{\footnotesize{}8a5efe6b 0c5a8d56 304804e8 aecfae16} \\
+		\texttt{\footnotesize{}2e3799dc 92ad1942 b4bd72c5 2a97f3bd} \\
+	}
+	& 32 bytes \\
+
 	\hline
 	\texttt{\footnotesize{}Message}
 	& \makecell[cc]{%
@@ -834,6 +878,7 @@ values for the same input messages hashed with BLAKE2s.
 		\texttt{\footnotesize{}3296ea3c d6d94833 fdfd5bae 39656b3c} \\
 	}
 	& 64 bytes \\
+
 	\hline
 	\texttt{\footnotesize{}Massage} &
 	\makecell[cc]{%
@@ -843,61 +888,67 @@ values for the same input messages hashed with BLAKE2s.
 		\texttt{\footnotesize{}71cf2aec 4a9b9134 d3f05b9e 8eee1612} \\
 	}
 	& 64 bytes \\
+
 	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}24} \\
-	}
-	& 1 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}2120} \\
-	}
-	& 2 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}0d93575d} \\
-	}
-	& 4 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}184c2242 418d7bc6} \\
-	}
-	& 8 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
+	\texttt{\footnotesize{}abc}
 	& \makecell[cc]{%
-		\texttt{\footnotesize{}ea30fef5 179fa367 0595e817 933e0ce8} \\
+		\texttt{\footnotesize{}0981401f 1f3003cb 92666dc6 a71e9fc0} \\
+		\texttt{\footnotesize{}4c212f14 685ac4b7 4b12bb6f dbffa2d1} \\
+		\texttt{\footnotesize{}7d87c539 2aab792d c252d5de 4533cc95} \\
+		\texttt{\footnotesize{}18d38aa8 dbf1925a b92386ed d4009923} \\
 	}
-	& 16 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[cc]{%
-		\texttt{\footnotesize{}8a5efe6b 0c5a8d56 304804e8 aecfae16} \\
-		\texttt{\footnotesize{}2e3799dc 92ad1942 b4bd72c5 2a97f3bd} \\
-	}
-	& 32 bytes \\
+	& 64 bytes \\
+
 	\hline
 	\end{tabular}
-\end{table}
 
+\end{table}
+%
+%----------------------------------------------------------------------------
+%
 \begin{table}[tb]
 	\centering
 		\caption{Example hashes and corresponding input messages for BLAKE2s}
 	\label{tbl:blake2s-hashes}
 	\begin{tabular}{l|l|l}
 	\hline
-	Input message & Hash & Hash length \\
+	\textbf{Input message} & \textbf{Hash} & \textbf{Hash length} \\
 	\hline
-	\texttt{\footnotesize{}abc}
-	& \makecell[cc]{%
-		\texttt{\footnotesize{}508c5e8c 327c14e2 e1a72ba3 4eeb452f} \\
-		\texttt{\footnotesize{}37458b20 9ed63a29 4d999b4c 86675982} \\
+
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}fb} \\
 	}
-	& 32 bytes \\
+	& 1 byte \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}46ce} \\
+	}
+	& 2 bytes \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}57c3d825} \\
+	}
+	& 4 bytes \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[lc]{%
+		\texttt{\footnotesize{}4a690e84 7edb95d8} \\
+	}
+	& 8 bytes \\
+
+	\hline
+	\texttt{\footnotesize{}Message}
+	& \makecell[cc]{%
+		\texttt{\footnotesize{}6e5cca08 1ec78d57 2b50cd1e efd754d1} \\
+	}
+	& 16 bytes \\
+
 	\hline
 	\texttt{\footnotesize{}Message}
 	& \makecell[cc]{%
@@ -905,6 +956,7 @@ values for the same input messages hashed with BLAKE2s.
 		\texttt{\footnotesize{}14f6ba03 0b6ab5e5 c9756aba 26b77219} \\
 	}
 	& 32 bytes \\
+
 	\hline
 	\texttt{\footnotesize{}Massage} &
 	\makecell[cc]{%
@@ -912,38 +964,19 @@ values for the same input messages hashed with BLAKE2s.
 		\texttt{\footnotesize{}82cc5a21 e760251a b7f090b7 7bdf8b5f} \\
 	}
 	& 32 bytes \\
+
 	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}fb} \\
-	}
-	& 1 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}46ce} \\
-	}
-	& 2 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}57c3d825} \\
-	}
-	& 4 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
-	& \makecell[lc]{%
-		\texttt{\footnotesize{}4a690e84 7edb95d8} \\
-	}
-	& 8 bytes \\
-	\hline
-	\texttt{\footnotesize{}Message}
+	\texttt{\footnotesize{}abc}
 	& \makecell[cc]{%
-		\texttt{\footnotesize{}6e5cca08 1ec78d57 2b50cd1e efd754d1} \\
+		\texttt{\footnotesize{}508c5e8c 327c14e2 e1a72ba3 4eeb452f} \\
+		\texttt{\footnotesize{}37458b20 9ed63a29 4d999b4c 86675982} \\
 	}
-	& 16 bytes \\
+	& 32 bytes \\
+
 	\hline
+
 	\end{tabular}
+
 \end{table}
 
 Since this design is to be used as a module of the larger \emph{Argon2}
@@ -1017,15 +1050,6 @@ Finished RTL Hierarchical Component Statistics
 ----------------------------------------------
 
 \end{lstlisting}
-%
-%----------------------------------------------------------------------------
-%
-\section{Usage}
-\label{sec:usage}
-
-\todo{Put in here typical usage examples the can be copied/pasted and ready to be
-used. I think it would be cool to have this for all the variants given in
-\Cref{sec:resource-allocation}}.
 %
 %----------------------------------------------------------------------------
 %
