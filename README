@@ -10,12 +10,15 @@ and Message Authentication Code as specified in
 	Internet Engineering Task Force, November 2015.
 	DOI: https://doi.org/10.17487/RFC7693
 
-This intellectual property (IP) core was developed in the digital integrated
-circuits lab at the Institute of Computer Technology, TU Wien. Vienna, April
+This intellectual property (IP) core was developed in the Digital Integrated
+Circuits Lab at the Institute of Computer Technology, TU Wien. Vienna, April
 2018.
 
 This package is licensed under the 3-clause BSD license:
 https://opensource.org/licenses/BSD-3-Clause
+
+The documentation is licensed under the CC BY 4.0 license:
+https://creativecommons.org/licenses/by/4.0/
 
 Authors:
 	Benedikt Tutzer
@@ -59,4 +62,4 @@ total, the length of the hash can be chosen by setting `hash_len'.
 After sending one chunk, wait for `compress_ready' to be `HIGH' before sending
 the next chunk. When the last chunk is sent, the input `last_chunk' needs to be
 set to `HIGH'. After the last chunk is encoded, the output `valid_out' is
-raised and the hash is available at the `output' port.
+raised and the hash is available at the `hash' port.
