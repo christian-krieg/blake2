@@ -10,9 +10,10 @@ and Message Authentication Code as specified in
 	Internet Engineering Task Force, November 2015.
 	DOI: https://doi.org/10.17487/RFC7693
 
-This intellectual property (IP) core was developed in the Digital Integrated
-Circuits Lab at the Institute of Computer Technology, TU Wien. Vienna, April
-2018.
+This intellectual property (IP) core was developed in the course "Digital
+Integrated Circuits Design" at the Institute of Computer Technology, Vienna
+University of Technology (TU Wien).
+Vienna, April 2018.
 
 This package is licensed under the 3-clause BSD license:
 https://opensource.org/licenses/BSD-3-Clause
