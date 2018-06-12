@@ -574,8 +574,15 @@ split the message into chunks of \emph{BLOCK_SIZE} bytes. Apply
 them to the \emph{message} port sequentially. Once the message is stable,
 raise \emph{valid_in} for one clock cycle.
 
+If a key shall be used, it has be be sent as first chunk, padded with zeroes.
+The length of the key needs to be available at the \emph{key_len} port.
+
 \emph{message_len} needs to be set to the number of bytes that are to be
-hashed in total, the length of the hash can be chosen by setting
+hashed in total. This includes the additional chunk containing the key, so when
+a key is used, the size of one complete chunk needs to be added to
+\emph{message_len} (128 for blake2b or 64 for blake2s respectively).
+
+The length of the hash can be chosen by setting
 \emph{hash_len}.
 
 After sending one chunk, wait for \emph{compress_ready} to be `HIGH' before
@@ -695,6 +702,12 @@ BLAKE2s and BLAKE2b cores are illustrated in \Cref{fig:blake-entity}.
 	& Input
 	& max. 2147483647
 	& Total length of input message in bytes
+	\\\hline
+
+	key_len
+	& Input
+	& max. 128/64
+	& Length of the key
 	\\\hline
 
 	reset
