@@ -163,35 +163,22 @@ int blake2b(void *out, size_t outlen,
 	return 0;
 }
 
+//
+// USAGE: blake2b message key hash_length
+//
 int main(int argc, char* argv[])
 {
-	size_t outlen = 64;
+	unsigned int outlen = atoi(argv[3]);
+	if(outlen > 64)
+			return -1;
+	if(strlen(argv[2]) > 128)
+			return -2;
 	uint8_t* out = malloc(outlen*sizeof(uint8_t));
-	size_t inlen;
-	if(argc == 1)
-	{
-		inlen = 0;
-		uint8_t* in = malloc(inlen*sizeof(uint8_t));
-		memset(in, 0, inlen);
-		blake2b(out, outlen, NULL, 0, in, inlen);
-		unsigned int i;
-		for(i = 0 ; i < outlen ; i++)
-			printf("%02x", out[i]);
-		printf("\n");
-		free(out);
-		free(in);
-		return 0;
-	}
+	blake2b(out, outlen, argv[2], strlen(argv[2]), argv[1], strlen(argv[1]));
 	unsigned int i;
-	for(i = 1 ; i < argc ; i++)
-	{
-		inlen = strlen(argv[i]);
-		blake2b(out, outlen, NULL, 0, argv[i], inlen);
-		unsigned int j;
-		for(j = 0 ; j < outlen ; j++)
-			printf("%02x", out[j]);
-		printf("\n");
-	}
+	for(i = 0 ; i < outlen ; i++)
+		printf("%02x", out[i]);
+	printf("\n");
 	free(out);
 	return 0;
 }

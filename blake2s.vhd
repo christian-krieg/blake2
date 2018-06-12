@@ -59,8 +59,14 @@ entity blake2s is
 		hash_len: in integer range 1 to 32;
 
 		--
+		-- Length of the key
+		--
+		key_len : in integer range 0 to 64 * 8;
+
+		--
 		-- High as long as chunks are sent
 		--
+
 		valid_in: in std_logic;
 
 		--
@@ -117,6 +123,7 @@ architecture behav of blake2s is
 			clk            : in std_logic;
 			message        : in std_logic_vector(BLOCK_SIZE * 8 - 1 downto 0);
 			hash_len       : in integer range 1 to MAX_HASH_LENGTH;
+			key_len        : in integer range 0 to BLOCK_SIZE * 8;
 			valid_in       : in std_logic;
 			message_len    : in integer range 0 to MAX_MESSAGE_LENGTH;
 			compress_ready : out std_logic;
@@ -146,6 +153,7 @@ begin
 		valid_in       => valid_in,
 		message_len    => message_len,
 		hash_len       => hash_len,
+		key_len        => key_len,
 		compress_ready => compress_ready,
 		last_chunk     => last_chunk,
 		valid_out      => valid_out,

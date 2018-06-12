@@ -32,10 +32,13 @@ make -C testgen
 rm hashes_blake2b.txt
 rm hashes_blake2s.txt
 
-while IFS='' read -r line || [[ -n "$line" ]]; do
-	./testgen/blake2b "$line" >> hashes_blake2b.txt
-	./testgen/blake2s "$line" >> hashes_blake2s.txt
-done < messages.txt
+while true
+do
+		read -r f1 <&3 || break
+		read -r f2 <&4 || break
+		./testgen/blake2b "$f1" "$f2" 64 >> hashes_blake2b.txt
+		./testgen/blake2s "$f1" "$f2" 32 >> hashes_blake2s.txt
+done 3<messages.txt 4<keys.txt
 
 ghdl -s --std=08 *.vhd
 ghdl -a --std=08 *.vhd

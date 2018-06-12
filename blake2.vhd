@@ -90,6 +90,11 @@ entity blake2 is
 		hash_len: in integer range 1 to MAX_HASH_LENGTH;
 
 		--
+		-- Length of the key
+		--
+		key_len : in integer range 0 to BLOCK_SIZE * 8;
+
+		--
 		-- High as long as chunks are sent
 		--
 		valid_in: in std_logic;
@@ -306,7 +311,8 @@ begin
 					-- Initialize the persistent state vector
 					--
 					h(0) <= VI(0)(63 downto 64-BASE_WIDTH) xor
-								((BASE_WIDTH-32-1 downto 0 => '0') & (X"010100"
+								((BASE_WIDTH-32-1 downto 0 => '0') & (X"0101"
+								& std_logic_vector(to_unsigned(key_len,8))
 								& std_logic_vector(to_unsigned(hash_len,8))));
 
 					for i in 1 to 7 loop

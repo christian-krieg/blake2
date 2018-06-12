@@ -63,6 +63,7 @@ architecture behav of tb_blake2b is
 			clk            : in  std_logic;
 			message        : in  std_logic_vector(128 * 8 - 1 downto 0);
 			hash_len       : in  integer range 1 to 64;
+			key_len        : in integer range 0 to 128*8;
 			valid_in       : in  std_logic;
 			message_len    : in  integer range 0 to 2147483647;
 			compress_ready : out std_logic;
@@ -77,6 +78,7 @@ architecture behav of tb_blake2b is
 	signal clk            : std_logic;
 	signal message        : std_logic_vector(128 * 8 - 1 downto 0);
 	signal hash_len       : integer range 1 to 64;
+	signal key_len        : integer range 0 to 128 * 8;
 	signal valid_in       : std_logic;
 	signal message_len    : integer range 0 to 2147483647;
 	signal compress_ready : std_logic;
@@ -117,6 +119,7 @@ begin
 		valid_in       => valid_in,
 		message_len    => message_len,
 		hash_len       => hash_len,
+		key_len        => key_len,
 		compress_ready => compress_ready,
 		last_chunk     => last_chunk,
 		valid_out      => valid_out,
@@ -144,8 +147,10 @@ begin
 
 		type char_file_t is file of character;
 		file message_file : TEXT open read_mode is "messages.txt";
+		file key_file : TEXT open read_mode is "keys.txt";
 		file hash_file_2b : TEXT open read_mode is "hashes_blake2b.txt";
 		variable line_buffer : line;
+		variable line_buffer_keys : line;
 		variable value_in : std_logic_vector(64 * 8 - 1 downto 0);
 		variable char_value_1 : std_logic_vector(7 downto 0);
 		variable char_value_2 : std_logic_vector(7 downto 0);
@@ -172,7 +177,7 @@ begin
 		counter := 0;
 		message <= (others => '0');
 
-		while not endfile(message_file) loop
+		while not endfile(message_file) and not endfile(key_file) loop
 
 			counter := 0;
 			message <= (others => '0');
@@ -182,11 +187,36 @@ begin
 			-- Read single line
 			--
 			readline(message_file, line_buffer);
-
+			readline(key_file, line_buffer_keys);
 			--
 			-- Message length equals line length
 			--
 			message_len <= line_buffer'length;
+			key_len <= line_buffer_keys'length;
+
+			wait for period;
+
+			counter := 0;
+			if key_len > 0 and key_len <= 128 then
+				message_len <= message_len + 128;
+				message <= (others => '0');
+				for i in 0 to line_buffer_keys'length - 1 loop
+						read(line_buffer_keys, current_char);
+						char_value_1 := std_logic_vector(to_unsigned(character'pos(current_char),8));
+						message(counter * 8 + 7 downto counter * 8) <= char_value_1;
+						counter := counter + 1;
+				end loop;
+
+				wait for period;
+				last_chunk <= '0';
+				valid_in <= '1';
+				wait for period;
+				valid_in <= '0';
+				message <= (others => '0');
+				wait for period * 835;
+
+				counter := 0;
+			end if;
 
 			for i in 0 to line_buffer'length - 1 loop
 
