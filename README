@@ -1,6 +1,5 @@
-                             BLAKE2 VHDL IP Core
-                             ===================
-
+BLAKE2 VHDL IP Core
+===================
 
 This package provides a VHDL implementation of the BLAKE2 Cryptographic Hash
 and Message Authentication Code as specified in
@@ -32,7 +31,7 @@ Supervisors:
 
 
 CONTENTS
-========
+--------
 
 1) The top entity is implemented in blake2.vhd.
 
@@ -51,7 +50,7 @@ to be adapted to the simulator's command-line interface.
 
 
 HOW TO USE
-==========
+----------
 
 Split the message to be hashed into chunks of `BLOCK_SIZE' bytes. Send them to
 the entity sequentially by setting the message port and raising `valid_in' for
@@ -64,3 +63,16 @@ After sending one chunk, wait for `compress_ready' to be `HIGH' before sending
 the next chunk. When the last chunk is sent, the input `last_chunk' needs to be
 set to `HIGH'. After the last chunk is encoded, the output `valid_out' is
 raised and the hash is available at the `hash' port.
+
+
+TODO
+----
+
+1. Design and implement an Advanced Extensible Interface (AXI) controller
+   to include the core in a system-on-chip (SoC) design. Check out the
+   following repository on github: 
+
+   https://github.com/Architech-Silica/Designing-a-Custom-AXI-Slave-Peripheral
+
+2. Implement the core on as many different platforms as possible and report
+   area, timing, power consumption, utilized resources
