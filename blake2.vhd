@@ -253,22 +253,12 @@ architecture behav of blake2 is
 	--
 	signal compressed_bytes: std_logic_vector(BASE_WIDTH*2-1 downto 0);
 
+	signal x : std_logic_vector(BASE_WIDTH-1 downto 0);
+	signal y : std_logic_vector(BASE_WIDTH-1 downto 0);
+
 begin
 
 	process(clk, reset)
-
-		--
-		-- Helper variables for the mixing operations. These correspond to the
-		-- variable names in RFC7693
-		--
-		variable a: std_logic_vector(BASE_WIDTH-1 downto 0);
-		variable b: std_logic_vector(BASE_WIDTH-1 downto 0);
-		variable c: std_logic_vector(BASE_WIDTH-1 downto 0);
-		variable d: std_logic_vector(BASE_WIDTH-1 downto 0);
-		variable x: std_logic_vector(BASE_WIDTH-1 downto 0);
-		variable y: std_logic_vector(BASE_WIDTH-1 downto 0);
-		variable help_sigma_x : integer range 0 to 15;
-		variable help_sigma_y : integer range 0 to 15;
 
 	begin
 
@@ -286,22 +276,6 @@ begin
 			hash <= (others => '0');
 
 		elsif rising_edge(clk) then
-
-			--
-			-- Assign the right local vector and message to the variables
-			-- according to the index table
-			--
-			a := v(ind(mi_done, 0));
-			b := v(ind(mi_done, 1));
-			c := v(ind(mi_done, 2));
-			d := v(ind(mi_done, 3));
-			help_sigma_x := SIGMA(ci_done, ind(mi_done,4));
-			help_sigma_y := SIGMA(ci_done, ind(mi_done,5));
-
-			for i in 0 to BASE_WIDTH - 1 loop
-				x(i) := current_chunk(help_sigma_x*BASE_WIDTH+i);
-				y(i) := current_chunk(help_sigma_y*BASE_WIDTH+i);
-			end loop;
 
 			case(state) is
 
@@ -426,6 +400,11 @@ begin
 					-- Start mixing
 					--
 					state <= STATE_MIX_A;
+					
+					for i in 0 to BASE_WIDTH - 1 loop
+						x(i) <= current_chunk(SIGMA(ci_done, ind(0, 4))*BASE_WIDTH+i);
+						y(i) <= current_chunk(SIGMA(ci_done, ind(0, 5))*BASE_WIDTH+i);
+					end loop;
 
 				when STATE_MIX_A =>
 
@@ -434,9 +413,15 @@ begin
 					--
 					case mio_done is
 
-						when "11"|"01" =>	v(ind(mi_done, 2)) <= std_logic_vector(unsigned(c) + unsigned(d));
-						when "00" => v(ind(mi_done, 0)) <= std_logic_vector(unsigned(a) + unsigned(b) + unsigned(x));
-						when "10" => v(ind(mi_done, 0)) <= std_logic_vector(unsigned(a) + unsigned(b) + unsigned(y));
+						when "11"|"01" =>
+								-- c + d
+								v(ind(mi_done, 2)) <= std_logic_vector(unsigned(v(ind(mi_done, 2))) + unsigned(v(ind(mi_done, 3))));
+						when "00" =>
+								-- a + b + x
+								v(ind(mi_done, 0)) <= std_logic_vector(unsigned(v(ind(mi_done, 0))) + unsigned(v(ind(mi_done, 1))) + unsigned(x));
+						when "10" =>
+								-- a + b + y
+								v(ind(mi_done, 0)) <= std_logic_vector(unsigned(v(ind(mi_done, 0))) + unsigned(v(ind(mi_done, 1))) + unsigned(y));
 						when others =>
 
 					end case;
@@ -448,12 +433,22 @@ begin
 					--
 					-- XORs and shifts as defined by Blake2
 					--
+					-- In the comments, the notation A//B is used to differentiate between values for blake2b (A) and blake2s (B)
+					--
 					case mio_done is
 
-						when "00" => v(ind(mi_done,3)) <= std_logic_vector(unsigned(d xor a) ror BASE_WIDTH / 2);           -- 32/16
-						when "01" => v(ind(mi_done,1)) <= std_logic_vector(unsigned(b xor c) ror 3 * BASE_WIDTH / 8);       -- 24/12
-						when "10" => v(ind(mi_done,3)) <= std_logic_vector(unsigned(d xor a) ror BASE_WIDTH/4);             -- 16/8
-						when "11" => v(ind(mi_done,1)) <= std_logic_vector(unsigned(b xor c) ror 7 * BASE_WIDTH / 4 - 49);  -- 63/7
+						when "00" =>
+								-- d xor a ror 32//16
+								v(ind(mi_done,3)) <= std_logic_vector(unsigned(v(ind(mi_done, 3)) xor v(ind(mi_done, 0))) ror BASE_WIDTH / 2);
+						when "01" =>
+								-- b xor c ror 24//12
+								v(ind(mi_done,1)) <= std_logic_vector(unsigned(v(ind(mi_done, 1)) xor v(ind(mi_done, 2))) ror 3 * BASE_WIDTH / 8);
+						when "10" =>
+								-- d xor a ror 16//8
+								v(ind(mi_done,3)) <= std_logic_vector(unsigned(v(ind(mi_done, 3)) xor v(ind(mi_done, 0))) ror BASE_WIDTH/4);
+						when "11" =>
+								-- b xor c ror 63//7
+								v(ind(mi_done,1)) <= std_logic_vector(unsigned(v(ind(mi_done, 1)) xor v(ind(mi_done, 2))) ror 7 * BASE_WIDTH / 4 - 49);
 						when others =>
 
 					end case;
@@ -494,7 +489,17 @@ begin
 
 					else
 
-						if mio_done = "11" then mi_done <= mi_done + 1;
+						if mio_done = "11" then
+							mi_done <= mi_done + 1;
+							for i in 0 to BASE_WIDTH - 1 loop
+								x(i) <= current_chunk(SIGMA(ci_done, ind(mi_done+1, 4))*BASE_WIDTH+i);
+								y(i) <= current_chunk(SIGMA(ci_done, ind(mi_done+1, 5))*BASE_WIDTH+i);
+							end loop;
+						else
+							for i in 0 to BASE_WIDTH - 1 loop
+								x(i) <= current_chunk(SIGMA(ci_done, ind(mi_done, 4))*BASE_WIDTH+i);
+								y(i) <= current_chunk(SIGMA(ci_done, ind(mi_done, 5))*BASE_WIDTH+i);
+							end loop;
 						end if;
 
 						state <= STATE_MIX_A;
