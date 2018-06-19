@@ -22,7 +22,7 @@ hashes*
 *.ist
 *.out
 *.run.xml
-*.pdf
+doc/blake2.pdf
 *.sw*
 *.blg
 *.bbl

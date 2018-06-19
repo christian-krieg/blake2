@@ -580,7 +580,7 @@ The length of the key needs to be available at the \emph{key_len} port.
 \emph{message_len} needs to be set to the number of bytes that are to be
 hashed in total. This includes the additional chunk containing the key, so when
 a key is used, the size of one complete chunk needs to be added to
-\emph{message_len} (128 for blake2b or 64 for blake2s respectively).
+\emph{message_len} (128 for BLAKE2b or 64 for BLAKE2s respectively).
 
 The length of the hash can be chosen by setting
 \emph{hash_len}.
@@ -660,7 +660,7 @@ BLAKE2s and BLAKE2b cores are illustrated in \Cref{fig:blake-entity}.
 	\centering
 	\caption{Ports for the BLAKE2 cores}	
 	\label{tbl:blake2-ports}
-	\renewcommand{\arraystretch}{2}
+	\renewcommand{\arraystretch}{1.5}
 	\begin{tabular}{l|c|c|m{3cm}}
 
 
@@ -934,8 +934,6 @@ the following states (and state transitions):
 		The counter which counts the number of mixing rounds \emph{ci_done} is reset
 		to zero (there should be 10 or 12 rounds mixing a message). The next state is
 		\mbox{STATE_COMPRESS}.
-
-	\pagebreak
 
 	\item STATE_COMPRESS
 
@@ -1257,40 +1255,6 @@ values for the same input messages hashed with BLAKE2s.
 %
 %----------------------------------------------------------------------------
 %
-\section{Additional notes}
-\label{sec:additional-notes}
-
-For the reference implementation given in RFC 7693~\autocite{rfc7693},
-the input parameter is the whole message whose length can have between 1
-and $2^{128}$ bytes.
-%
-This long message is intended to be divided into 128-byte message blocks
-during hash computation. Since VHDL does not support such large input
-vectors, we decided to send the message block by block.
-%
-This way, our data input is 128 bytes long, and we introduced additional
-information regarding the message length (\emph{message_len} input).
-%
-%The maximum message length was specified to be 1032 bytes since this is the
-%maximum length needed by \emph{Argon2}.\todo{Is this still valid?}
-%
-For every message block we need the information of the main module whether there
-is a new message block available (signal \emph{valid_in} goes high) and the flag
-register for the last message block \emph{last_chunk} (high if the last message
-block is sent).
-%
-For the output we provide handshaking signals \emph{compress_ready}
-and $valid\_out$, the user of our package must make sure that
-\emph{compress_ready} is high before sending a new message block, and the
-output hash can be stored when \emph{valid_out} is high.
-%
-The input messages in \texttt{messages.txt} file can be empty message. However
-messages are not allowed to contain whitespace. \done{Why not? This is a very
-strong constraint! We should definitely allow whitespace.}
-%
-%----------------------------------------------------------------------------
-%
-\pagebreak
 \section{Resource allocation}
 \label{sec:resource-allocation}
 
@@ -1345,6 +1309,39 @@ Finished RTL Hierarchical Component Statistics
 ----------------------------------------------
 
 \end{lstlisting}
+%
+%----------------------------------------------------------------------------
+%
+\section{Additional notes}
+\label{sec:additional-notes}
+
+For the reference implementation given in RFC 7693~\autocite{rfc7693},
+the input parameter is the whole message whose length can have between 1
+and $2^{128}$ bytes.
+%
+This long message is intended to be divided into 128-byte message blocks
+during hash computation. Since VHDL does not support such large input
+vectors, we decided to send the message block by block.
+%
+This way, our data input is 128 bytes long, and we introduced additional
+information regarding the message length (\emph{message_len} input).
+%
+%The maximum message length was specified to be 1032 bytes since this is the
+%maximum length needed by \emph{Argon2}.\todo{Is this still valid?}
+%
+For every message block we need the information of the main module whether there
+is a new message block available (signal \emph{valid_in} goes high) and the flag
+register for the last message block \emph{last_chunk} (high if the last message
+block is sent).
+%
+For the output we provide handshaking signals \emph{compress_ready}
+and $valid\_out$, the user of our package must make sure that
+\emph{compress_ready} is high before sending a new message block, and the
+output hash can be stored when \emph{valid_out} is high.
+%
+The input messages in \texttt{messages.txt} file can be empty message. However
+messages are not allowed to contain whitespace. \done{Why not? This is a very
+strong constraint! We should definitely allow whitespace.}
 %
 %----------------------------------------------------------------------------
 %
