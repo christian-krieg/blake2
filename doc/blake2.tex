@@ -444,7 +444,8 @@ RFC 7693. We used state machines to implement \emph{BLAKE2}.
 Functional correctness is verified by comparing the produced output to the
 reference implementation given in C. Our test bench compares the output of our
 entity with the reference hash value for the same message input and reports
-the result to stdout.
+the result to stdout. A minimal design for the Digilent NEXYS 4 DDR board was
+developed to prove that the blake2 cores are synthesizable and work as expected.
 % The \emph{BLAKE2b} hash function
 %entity is to be used as a component of \emph{Argon2} memory hard function
 %which should generate cryptographically secure keys from passwords as
@@ -1255,6 +1256,36 @@ values for the same input messages hashed with BLAKE2s.
 %
 %----------------------------------------------------------------------------
 %
+
+\section{Verification in Hardware}
+A minimal design was developed to test the blake2b core in hardware. It is
+available in the \emph{test\_top} subdirectory and can be synthesized using
+Vivado targeting the Digilent Nexys DDR 4 board.\\
+Communication to the core is given through the serial interface on the board,
+allowing a host pc to send hash-requests to the internal blake2b core, which
+will then respond by sending the requested hash back through the serial
+interface. To request a hash, the following command needs to be issued by the
+host pc:
+\begin{center}
+\emph{message\_len},\emph{hash\_len},\emph{key\_len},\emph{key},\emph{message}
+\end{center}
+where the parameters need to be chosen as follows:
+\begin{itemize}
+	\item \emph{message\_len}: The length of the message in byte
+	\item \emph{hash\_len}: The length of the requested hash
+	\item \emph{key\_len}: The length of the key to be used
+	\item \emph{key}: The key to be used. The length of this field is given by
+		\emph{key\_len}
+	\item \emph{message}: The message to be used. The length of this field is given by
+		\emph{message\_len}
+\end{itemize}
+Please note that there is no error handling, so the used must make sure that the
+parameters that are sent to the board are inside the specifications of blake2b,
+otherwise the behaviour is undefined.\\
+The response from the board will be the raw binary representation of the hash
+code. The result will be exactly as long as requested by the parameter
+\emph{hash\_len}.
+
 \section{Resource allocation}
 \label{sec:resource-allocation}
 
